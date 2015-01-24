@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+</head>
+<style>
+path{
+  stroke-width:.5;
+  stroke-linejoin:round;
+  fill:#F0F4F4;
+}
+path:hover{
+  stroke:red;
+  stroke-width:1;
+}
+
+.place-label {
+  fill: #444;
+}
+
+text{
+  font-family: "Calibri", Helvetica, Arial, sans-serif;
+  font-size: 10px;
+}
+
+.subunit-label{
+  fill: #777;
+  fill-opacity: .5;
+  font-size:20px;
+  font-weight:300;
+  text-anchor:middle;
+}
+
+
+.q0-9 { fill:rgb(244,194,194); }
+.q1-9 { fill:rgb(255,105,97); }
+.q2-9 { fill:rgb(255,92,92); }
+.q3-9 { fill:rgb(255,28,0); }
+.q4-9 { fill:rgb(255,0,0); }
+.q5-9 { fill:rgb(204,0,0); }
+.q6-9 { fill:rgb(164,0,0); }
+.q7-9 { fill:rgb(128,0,0); }
+.q8-9 { fill:rgb(50,20,20); }
+
+</style>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/queue.v1.min.js"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script>
+  var width=960;
+  var height =650;
+
+  // var rateById = d3.map();
+
+  var quantize = d3.scale.quantize()
+  .domain([0, 120000])
+  .range(d3.range(9).map(function(i){return "q"+i+"-9"}))
+
+  var svg = d3.select("body").append("svg")
+  .attr("width",width)
+  .attr("height",height);
+
+  var projection = d3.geo.albersUsa()
+  .scale(1280)
+  .translate([width / 2, height / 2]);
+
+  var path = d3.geo.path()
+  .projection(projection);
+
+  queue()
+  .defer(d3.json,"./us_counties_fips.json")
+  .defer(d3.json,"./data.json")
+  // .defer(d3.tsv, "./unemployment.tsv",function(d){rateById.set(d.id, +d.rate);})
+  .await(ready);
+
+  function ready(error,usa,json)
+  {
+    console.log(usa);
+    console.log(json);
+    svg.append("g")
+    .attr("class","counties")
+    .selectAll("path")
+    .data(topojson.feature(usa,usa.objects.counties).features)
+    .enter().append("path")
+    .attr("class",function(json){return quantize(json.id);})
+    // .attr("class",function(d){return quantize(rateById.get(json.id));})
+    .attr("d",path)
+
+
+    svg.selectAll(".place-label")
+    .data(topojson.feature(usa,usa.objects.places_usa).features)
+    .enter().append("text")
+    .attr("class","place-level")
+    .attr("transform",function(d){ return "translate(" + projection(d.geometry.coordinates) + ")"; })
+    .attr("x", function(d){ return d.geometry.coordinates[0] > -1 ? 6: -6;})
+    .attr("dy",".35em")
+    .style("text-anchor", function(d){ return d.geometry.coordinates[0] > -1? "start": "end";})
+    .text(function(d) { return d.properties.name;});
+    // var subunits = topojson.feature(usa, usa.objects.subunits_usa);
+    //
+    // var projection = d3.geo.albersUsa()
+    // // .center([0,55.4])
+    // // .rotate([100,0])
+    // // .parallels([50,60])
+    // // .scale(1000)
+    // //.translate([width/2, height/2]);
+    //
+    // var path = d3.geo.path()
+    // .projection(projection);
+    //
+    // svg.append("path")
+    //  .datum(subunits)
+    //  .attr("d", path);
+
+    console.log(usa);
+  };
+  </script>
+</body>
