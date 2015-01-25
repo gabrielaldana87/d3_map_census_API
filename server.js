@@ -35,12 +35,12 @@ app.use(express.static(__dirname + '/public'));
 fs.readFile("./key.txt",function(e,data)
 {
   var key = data.toString();
-  var url = "http://api.census.gov/data/2012/acs5/profile?get=DP03_0062E&for=county:*"+key;
+  // var url = "http://api.census.gov/data/2012/acs5/profile?get=DP03_0062E&for=county:*"+key;
 
 app.get('/', function(req, res)
 {
+  var url = "http://api.census.gov/data/2012/acs5/profile?get=DP03_0062E&for=county:*"+key;
   console.log(url);
-  var personJSON;
   request(url, function(error, response, body)
   {
     if(!error && response.statusCode === 200)
@@ -78,6 +78,50 @@ app.get('/', function(req, res)
   });
   res.sendFile(__dirname + './public/map.html');
 })
+
+app.get('/:indicator',function(req, res)
+{
+  var url = "http://api.census.gov/data/2012/acs5/profile?get="+req.params.indicator+"&for=county:*"+key;
+  console.log(url);
+  request(url, function(error, response, body)
+  {
+    if(!error && response.statusCode === 200)
+      {
+        var data = JSON.parse(body);
+
+        data.forEach(function(fips)
+        {
+          var obj =
+          {
+            id: fips[1]+fips[2],
+            rate: fips[0]
+          }
+          array.push(obj);
+        });
+        var county=data[1][1]+data[1][2];
+
+        fs.writeFile("dummy.json",JSON.stringify(array),function(e)
+        {
+          console.log("done!");
+        })
+
+        var lowest = Number.POSITIVE_INFINITY;
+        var highest = Number.NEGATIVE_INFINITY;
+        var tmp;
+
+        for(var i=array.length-1;i>=1;i--)
+          {
+            tmp = array[i].m_income;
+            if(tmp < lowest) lowest=tmp;
+            if(tmp > highest) highest =tmp;
+          }
+          console.log("highest: "+highest,"lowest: "+lowest);
+        }
+      });
+      res.sendFile(__dirname + './public/map.html');
+})
+
+
 });
 
 
