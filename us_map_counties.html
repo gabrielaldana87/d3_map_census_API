@@ -4,9 +4,9 @@
 </head>
 <style>
 path{
-  stroke-width:.5;
+  stroke-width:.1;
   stroke-linejoin:round;
-  fill:#F0F4F4;
+  stroke:black;
 }
 path:hover{
   stroke:red;
@@ -31,15 +31,16 @@ text{
 }
 
 
-.q0-9 { fill:rgb(244,194,194); }
-.q1-9 { fill:rgb(255,105,97); }
-.q2-9 { fill:rgb(255,92,92); }
-.q3-9 { fill:rgb(255,28,0); }
-.q4-9 { fill:rgb(255,0,0); }
-.q5-9 { fill:rgb(204,0,0); }
-.q6-9 { fill:rgb(164,0,0); }
-.q7-9 { fill:rgb(128,0,0); }
-.q8-9 { fill:rgb(50,20,20); }
+.q0-9 { fill:#004F44; }
+.q1-9 { fill:#009B7C; }
+.q2-9 { fill:#3CBB90; }
+.q3-9 { fill:#B9DEBD; }
+.q4-9 { fill:#d5edea; }
+.q5-9 { fill:#FBAF4D; }
+.q6-9 { fill:#FF8E88; }
+.q7-9 { fill:#FF473D; }
+.q8-9 { fill:#FF180E; }
+.q9-9 { fill:#BF0A00; }
 
 </style>
 <body>
@@ -50,11 +51,11 @@ text{
   var width=960;
   var height =650;
 
-  // var rateById = d3.map();
+  var rateById = d3.map();
 
   var quantize = d3.scale.quantize()
   .domain([0, 120000])
-  .range(d3.range(9).map(function(i){return "q"+i+"-9"}))
+  .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
   var svg = d3.select("body").append("svg")
   .attr("width",width)
@@ -70,20 +71,24 @@ text{
   queue()
   .defer(d3.json,"./us_counties_fips.json")
   .defer(d3.json,"./data.json")
-  // .defer(d3.tsv, "./unemployment.tsv",function(d){rateById.set(d.id, +d.rate);})
+  // .defer(d3.json,"./data.json",function(error,json)
+  // {if(error) return console.warn(error);json.forEach(function(obj){rateById.set(obj.id,obj.m_income)})})
   .await(ready);
 
-  function ready(error,usa,json)
+  function ready(err,usa,json)
   {
     console.log(usa);
     console.log(json);
+    json.forEach(function(obj)
+    {
+      rateById.set(obj.id,+obj.m_income);
+    })
     svg.append("g")
     .attr("class","counties")
     .selectAll("path")
     .data(topojson.feature(usa,usa.objects.counties).features)
     .enter().append("path")
-    .attr("class",function(json){return quantize(json.id);})
-    // .attr("class",function(d){return quantize(rateById.get(json.id));})
+    .attr("class",function(d){return quantize(rateById.get(d.id))})
     .attr("d",path)
 
 
