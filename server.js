@@ -29,7 +29,7 @@ var request = require('request');
 var fs = require('fs');
 
 var app = express();
-var array=[];
+
 app.use(express.static(__dirname + '/public'));
 
 fs.readFile("./key.txt",function(e,data)
@@ -39,6 +39,7 @@ fs.readFile("./key.txt",function(e,data)
 
 app.get('/', function(req, res)
 {
+  var array=[];
   var url = "http://api.census.gov/data/2012/acs5/profile?get=DP03_0062E&for=county:*"+key;
   console.log(url);
   request(url, function(error, response, body)
@@ -76,11 +77,12 @@ app.get('/', function(req, res)
         console.log("highest: "+highest,"lowest: "+lowest);
     }
   });
-  res.sendFile(__dirname + './public/map.html');
-})
+  res.sendFile(__dirname + '/public/map.html');
+});
 
 app.get('/:indicator',function(req, res)
 {
+  var array=[];
   var url = "http://api.census.gov/data/2012/acs5/profile?get="+req.params.indicator+"&for=county:*"+key;
   console.log(url);
   request(url, function(error, response, body)
@@ -100,7 +102,7 @@ app.get('/:indicator',function(req, res)
         });
         var county=data[1][1]+data[1][2];
 
-        fs.writeFile("dummy.json",JSON.stringify(array),function(e)
+        fs.writeFile("./public/"+req.params.indicator+".json",JSON.stringify(array),function(e)
         {
           console.log("done!");
         })
@@ -111,14 +113,14 @@ app.get('/:indicator',function(req, res)
 
         for(var i=array.length-1;i>=1;i--)
           {
-            tmp = array[i].m_income;
+            tmp = array[i].rate;
             if(tmp < lowest) lowest=tmp;
             if(tmp > highest) highest =tmp;
           }
           console.log("highest: "+highest,"lowest: "+lowest);
         }
       });
-      res.sendFile(__dirname + './public/map.html');
+      res.sendFile(__dirname + '/public/us_map_indicators.html');
 })
 
 

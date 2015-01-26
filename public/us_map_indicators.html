@@ -48,13 +48,46 @@ text{
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v1.min.js"></script>
   <script>
+  var body = document.querySelector("body");
+  var div = document.createElement("div");
+  body.appendChild(div);
+  div.id="container";
+  var div2 = document.createElement("div");
+  div.appendChild(div2);
+  div2.id="leftdiv";
+  var div3 = document.createElement("div");
+  div.appendChild(div3);
+  div3.id="rightdiv";
+  var div4 = document.createElement("div");
+  div3.appendChild(div4);
+  div4.id="inputbar";
+  // var form = document.createElement("form")
+  // div4.appendChild(form);
+  var input = document.createElement("input");
+  div4.appendChild(input);
+  input.type="text";
+  input.placeholder="enter demographic";
+  input.id="textbox";
+  // input.name="demographic";
+
+  var input2 = document.createElement("input");
+  div4.appendChild(input2);
+  input2.type="submit";
+  input2.value="Add";
+  input2.id="button";
+
+  input2.addEventListener("click",function()
+  {
+  var safeURL = input.value.replace(" ","+");
+  var file = safeURL;
+
   var width=960;
   var height =650;
 
   var rateById = d3.map();
 
   var quantize = d3.scale.quantize()
-  .domain([9000, 101000])
+  .domain([5,80])
   .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
   var svg = d3.select("body").append("svg")
@@ -70,7 +103,7 @@ text{
 
   queue()
   .defer(d3.json,"./us_counties_fips.json")
-  .defer(d3.json,"./data.json")
+  .defer(d3.json,file+".json")
   // .defer(d3.json,"./data.json",function(error,json)
   // {if(error) return console.warn(error);json.forEach(function(obj){rateById.set(obj.id,obj.m_income)})})
   .await(ready);
@@ -81,7 +114,7 @@ text{
     console.log(json);
     json.forEach(function(obj)
     {
-      rateById.set(obj.id,+obj.m_income);
+      rateById.set(obj.id,+obj.rate);
     })
     svg.append("g")
     .attr("class","counties")
@@ -90,7 +123,6 @@ text{
     .enter().append("path")
     .attr("class",function(d){return quantize(rateById.get(d.id))})
     .attr("d",path)
-
 
     svg.selectAll(".place-label")
     .data(topojson.feature(usa,usa.objects.places_usa).features)
@@ -118,6 +150,8 @@ text{
     //  .attr("d", path);
 
     console.log(usa);
+
   };
+});
   </script>
 </body>
