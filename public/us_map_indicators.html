@@ -6,7 +6,7 @@
 path{
   stroke-width:.1;
   stroke-linejoin:round;
-  stroke:black;
+  stroke:white;
 }
 path:hover{
   stroke:red;
@@ -30,7 +30,6 @@ text{
   text-anchor:middle;
 }
 
-
 .q0-9 { fill:#004F44; }
 .q1-9 { fill:#009B7C; }
 .q2-9 { fill:#3CBB90; }
@@ -48,6 +47,7 @@ text{
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v1.min.js"></script>
   <script>
+
   var body = document.querySelector("body");
   var div = document.createElement("div");
   body.appendChild(div);
@@ -78,16 +78,28 @@ text{
 
   input2.addEventListener("click",function()
   {
+
   var safeURL = input.value.replace(" ","+");
   var file = safeURL;
 
   var width=960;
   var height =650;
 
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET","http://localhost:3000/nums");
+  xhr.send();
+  xhr.addEventListener("load",function(e)
+  {
+  var d = xhr.responseText;
+  var parsed = JSON.parse(d);
+  console.log(parsed);
+  console.log(parsed[0].min);
+  console.log(parsed[0].max);
   var rateById = d3.map();
-
   var quantize = d3.scale.quantize()
-  .domain([5,80])
+
+  .domain([parsed[0].min,parsed[0].max])
+  //.domain()
   .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
   var svg = d3.select("body").append("svg")
@@ -104,8 +116,6 @@ text{
   queue()
   .defer(d3.json,"./us_counties_fips.json")
   .defer(d3.json,file+".json")
-  // .defer(d3.json,"./data.json",function(error,json)
-  // {if(error) return console.warn(error);json.forEach(function(obj){rateById.set(obj.id,obj.m_income)})})
   .await(ready);
 
   function ready(err,usa,json)
@@ -152,6 +162,7 @@ text{
     console.log(usa);
 
   };
+});
 });
   </script>
 </body>

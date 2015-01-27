@@ -33,7 +33,6 @@ input2.addEventListener("click",function()
   var method_look = safeURL;
 
   var xhr = new XMLHttpRequest();
-  // xhr.open("GET","http://localhost:3000/");
   xhr.open("GET","http://localhost:3000/"+method_look);
   xhr.addEventListener("load",function(e)
   {
@@ -41,15 +40,6 @@ input2.addEventListener("click",function()
     var parsed = JSON.parse(d);
     console.log(parsed);
   })
-  // xhr.open("GET", "http://api.census.gov/data/2012/acs5/profile?get="+method_look+"&for=county:*");
-  // xhr.addEventListener("load", function(e)
-  // {
-  //   var d=xhr.responseText;
-  //   var parsed=JSON.parse(d);
-  //   console.log(parsed);
-  //   console.log(parsed[1]);
-  //   var county=parsed[1][1]+parsed[1][2];
-  // })
   xhr.send();
 })
 
