@@ -6,7 +6,8 @@
 path{
   stroke-width:.1;
   stroke-linejoin:round;
-  stroke:white;
+  stroke:black;
+  fill:#f0f4f4;
 }
 path:hover{
   stroke:red;
@@ -30,6 +31,16 @@ text{
   text-anchor:middle;
 }
 
+/*.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}*/
+
+
 .q0-9 { fill:#004F44; }
 .q1-9 { fill:#009B7C; }
 .q2-9 { fill:#3CBB90; }
@@ -41,11 +52,26 @@ text{
 .q8-9 { fill:#FF180E; }
 .q9-9 { fill:#BF0A00; }
 
+#tooltip{
+  position: absolute;
+  z-index: 2;
+  background: rgba(0,153,76,.8);
+  width: 130px;
+  height: 20px;
+  color: white;
+  font-size: 14px;
+  padding: 5px;
+  top: -150px;
+  left: -150px;
+  font-family: "Calibri";
+}
+
 </style>
 <body>
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
   <script>
 
   var body = document.querySelector("body");
@@ -95,11 +121,11 @@ text{
   console.log(parsed);
   console.log(parsed[0].min);
   console.log(parsed[0].max);
-  var rateById = d3.map();
-  var quantize = d3.scale.quantize()
 
+  var rateById = d3.map();
+
+  var quantize = d3.scale.quantize()
   .domain([parsed[0].min,parsed[0].max])
-  //.domain()
   .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
   var svg = d3.select("body").append("svg")
@@ -112,6 +138,16 @@ text{
 
   var path = d3.geo.path()
   .projection(projection);
+
+  var tooltip = d3.select('body').append('div')
+  .style('position', 'absolute')
+  .style('padding', '0 10px')
+  .style('background', "rgba(0,153,76,.8)")
+  .style('font-size',"11px")
+  .style('font-family',"Calibri")
+  .style('color','white')
+  .style('width','100px')
+  .style('text-align','center')
 
   queue()
   .defer(d3.json,"./us_counties_fips.json")
@@ -133,13 +169,39 @@ text{
     .enter().append("path")
     .attr("class",function(d){return quantize(rateById.get(d.id))})
     .attr("d",path)
+    .on('click', function(d)
+    {
+      var test = rateById.get(d.id);
+      var paths = d3.select('path')
+      var pathclick = d3.selectAll('path');
+      pathclick.attr("class",function(d){ if (rateById.get(d.id) >= test){ return quantize(rateById.get(d.id))}})
+    })
+    .on('mouseover', function(d) {
+      tooltip.transition()
+      .style('opacity', .9)
+      tooltip.html(d.properties.name+" : "+rateById.get(d.id))
+      .style('left', (d3.event.pageX - 35) + 'px')
+      .style('top',  (d3.event.pageY - 30) + 'px')
+      tempColor = this.style.fill;
+      d3.select(this)
+      .style('opacity', .5)
+    })
+    .on('mouseout', function(d)
+    {
+      d3.select(this)
+      .style('opacity',1)
+      .style('fill',tempColor)
+    })
+    .attr("id","tooltip");
+
+
 
     svg.selectAll(".place-label")
     .data(topojson.feature(usa,usa.objects.places_usa).features)
     .enter().append("text")
     .attr("class","place-level")
     .attr("transform",function(d){ return "translate(" + projection(d.geometry.coordinates) + ")"; })
-    .attr("x", function(d){ return d.geometry.coordinates[0] > -1 ? 6: -6;})
+    .attr("x", function(d){ return d.geometry.coordinates[0] > -1? 6: -6;})
     .attr("dy",".35em")
     .style("text-anchor", function(d){ return d.geometry.coordinates[0] > -1? "start": "end";})
     .text(function(d) { return d.properties.name;});
@@ -158,6 +220,9 @@ text{
     // svg.append("path")
     //  .datum(subunits)
     //  .attr("d", path);
+
+
+
 
     console.log(usa);
 
