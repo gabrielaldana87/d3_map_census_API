@@ -68,6 +68,12 @@ text{
   var width = 1300,
   height = 1400;
 
+  var rateById = d3.map();
+
+  var quantize = d3.scale.quantize()
+  .domain([20000,230952])
+  .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
+
   var projection = d3.geo.mercator()
   .center([-73.80, 40.8])
   .scale(50000)
@@ -80,20 +86,52 @@ text{
   .attr("width", width)
   .attr("height", height);
 
+  var tooltip = d3.select('body').append('div')
+  .style('position', 'absolute')
+  .style('padding', '0 10px')
+  .style('background', "rgba(0,153,76,.8)")
+  .style('font-size',"11px")
+  .style('font-family',"Calibri")
+  .style('color','white')
+  .style('width','100px')
+  .style('text-align','center')
+
   queue()
   .defer(d3.json, "./topo_ny_zip.json")
-  .defer(d3.json, "./us_counties_fips.json")
+  .defer(d3.json, "./zip_rate.json")
   .await(ready);
 
   function ready(error, us, json) {
     console.log(us);
+    console.log(json);
+    json.forEach(function(obj)
+    {
+      rateById.set(obj.id,+obj.rate);
+    })
     svg.append("g")
-    .attr("class", "counties")
+    .attr("class", "zips")
     .selectAll("path")
-    // .data(topojson.feature(us,us.objects.tl_2010_36_zcta510).features)
     .data(topojson.feature(us,us.objects.zips_new_york_v2).features)
     .enter().append("path")
-    .attr("d", path);
+    .attr("class", function(d){return quantize(rateById.get(d.id))})
+    .attr("d", path)
+    .on('mouseover', function(d) {
+      tooltip.transition()
+      .style('opacity', .9)
+      tooltip.html(rateById.get(d.id))
+      .style('left', (d3.event.pageX - 35) + 'px')
+      .style('top',  (d3.event.pageY - 30) + 'px')
+      tempColor = this.style.fill;
+      d3.select(this)
+      .style('opacity', .5)
+    })
+    .on('mouseout', function(d)
+    {
+      d3.select(this)
+      .style('opacity',1)
+      .style('fill',tempColor)
+    })
+    .attr("id","tooltip");
   }
   </script>
 </body>
