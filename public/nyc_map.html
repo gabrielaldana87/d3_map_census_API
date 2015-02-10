@@ -5,16 +5,19 @@
 <style>
 
 path{
-  stroke-width:.1;
+  stroke-width:.5;
   stroke-linejoin:round;
-  stroke:black;
-  fill:#f0f4f4;
+  /*stroke:white;*/
+  fill:lightgrey;
 }
 path:hover{
   stroke:red;
   stroke-width:1;
 }
 
+svg{
+  background-color:white;
+}
 .place-label {
   fill: #444;
 }
@@ -33,16 +36,16 @@ text{
 }
 
 
-.q0-9 { fill:#004F44; }
-.q1-9 { fill:#009B7C; }
-.q2-9 { fill:#3CBB90; }
-.q3-9 { fill:#B9DEBD; }
-.q4-9 { fill:#d5edea; }
-.q5-9 { fill:#FBAF4D; }
-.q6-9 { fill:#FF8E88; }
-.q7-9 { fill:#FF473D; }
-.q8-9 { fill:#FF180E; }
-.q9-9 { fill:#BF0A00; }
+.q0-9 { fill:#A70000; }
+.q1-9 { fill:#FF0000; }
+.q2-9 { fill:#FF5252; }
+.q3-9 { fill:#FF7B7B; }
+.q4-9 { fill:#FFBABA; }
+.q5-9 { fill:#A4E6F4; }
+.q6-9 { fill:#3CAAE4; }
+.q7-9 { fill:#047EBC; }
+.q8-9 { fill:#0462A4; }
+.q9-9 { fill:#044284; }
 
 #tooltip{
   position: absolute;
@@ -71,7 +74,7 @@ text{
   var rateById = d3.map();
 
   var quantize = d3.scale.quantize()
-  .domain([20000,230952])
+  .domain([1,45])
   .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
   var projection = d3.geo.mercator()
@@ -115,10 +118,17 @@ text{
     .enter().append("path")
     .attr("class", function(d){return quantize(rateById.get(d.id))})
     .attr("d", path)
+    .on('click',function(d)
+    {
+      var rateclick = rateById.get(d.id);
+      var paths = d3.select('path')
+      var pathclick = d3.selectAll('path');
+      pathclick.attr("class",function(d){ if (rateById.get(d.id) >= rateclick){ return quantize(rateById.get(d.id))}})
+    })
     .on('mouseover', function(d) {
       tooltip.transition()
       .style('opacity', .9)
-      tooltip.html(rateById.get(d.id))
+      tooltip.html(d.id+" : "+rateById.get(d.id))
       .style('left', (d3.event.pageX - 35) + 'px')
       .style('top',  (d3.event.pageY - 30) + 'px')
       tempColor = this.style.fill;
