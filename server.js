@@ -58,43 +58,14 @@ app.get('/test', function(req,res)
   var array=[];
   var url = "http://api.census.gov/data/2013/acs5/profile?get=DP03_0062E&for=zip+code+tabulation+area:*"+key;
   console.log(url);
-  request(url, function(error, response, body)
-  {
-    if(!error && response.statusCode === 200)
-      {
-        var data = JSON.parse(body);
-
-        data.forEach(function(zip)
-        {
-          var datum =
-          {
-            id: zip[1],
-            rate: parseFloat(zip[0])
-          }
-          array.push(datum);
-        });
-        // var county=data[1][1]+data[1][2];
-
-        fs.writeFile("./public/zip_rate.json",JSON.stringify(array),function(e)
-        {
-          console.log("done!");
-        })
-
-        var lowest = Number.POSITIVE_INFINITY;
-        var highest = Number.NEGATIVE_INFINITY;
-        var tmp;
-
-        for(var i=array.length-1;i>=1;i--)
-          {
-            tmp = array[i].rate;
-            if(tmp < lowest) lowest=tmp;
-            if(tmp > highest) highest =tmp;
-          }
-          console.log("highest: "+highest,"lowest: "+lowest);
-        }
-      });
       res.sendFile(__dirname + '/public/nyc_map.html');
     })
+
+app.get('/nums', function(req, res)
+{
+  res.json(max_min);
+})
+
 
 app.get('/:indicator',function(req, res)
 {
@@ -102,6 +73,7 @@ app.get('/:indicator',function(req, res)
   {
   var array=[];
   var url = "http://api.census.gov/data/2012/acs5/profile?get="+req.params.indicator+"&for=county:*"+key;
+  var url2 = "http://api.census.gov/data/2013/acs5/profile?get="+req.params.indicator+"&for=zip+code+tabulation+area:*"+key;
   console.log(url);
   request(url, function(error, response, body)
   {
@@ -144,16 +116,47 @@ app.get('/:indicator',function(req, res)
           console.log("highest: "+highest,"lowest: "+lowest);
         }
     });
+    request(url2, function(error, response, body)
+    {
+      if(!error && response.statusCode === 200)
+        {
+          var data = JSON.parse(body);
+
+          data.forEach(function(zip)
+          {
+            var datum =
+            {
+              id: zip[1],
+              rate: parseFloat(zip[0])
+            }
+            array.push(datum);
+          });
+          // var county=data[1][1]+data[1][2];
+
+          fs.writeFile("./public/zip_rate.json",JSON.stringify(array),function(e)
+          {
+            console.log("done!");
+          })
+
+          var lowest = Number.POSITIVE_INFINITY;
+          var highest = Number.NEGATIVE_INFINITY;
+          var tmp;
+
+          for(var i=array.length-1;i>=1;i--)
+            {
+              tmp = array[i].rate;
+              if(tmp < lowest) lowest=tmp;
+              if(tmp > highest) highest =tmp;
+            }
+            console.log("highest: "+highest,"lowest: "+lowest);
+          }
+        });
       res.sendFile(__dirname + '/public/us_map_indicators.html');
     };
 })
 
 
 
-app.get('/nums', function(req, res)
-{
-  res.json(max_min);
-})
 
 
 });
