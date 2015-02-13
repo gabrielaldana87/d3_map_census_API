@@ -10,6 +10,11 @@ fs.readFile("./key.txt",function(e,data)
 {
   var key = data.toString();
 
+app.get('/',function(req,res)
+{
+  res.sendFile(__dirname + '/public/us_map_indicators.html');
+});
+
 app.get('/nums', function(req, res)
 {
   res.json(max_min);
@@ -26,57 +31,61 @@ app.get('/variables', function(req,res)
 });
 
 app.get('/:indicator',function(req, res)
-{
+  {
   if(req.params.indicator!=='favicon.ico')
-  {
-  var array=[];
-  var array2 = [];
-  var url  = "http://api.census.gov/data/2012/acs5/profile?get="+req.params.indicator+"&for=county:*"+key;
-  var url2 = "http://api.census.gov/data/2013/acs5/profile?get="+req.params.indicator+"&for=zip+code+tabulation+area:*"+key;
-  var url3 = "http://api.census.gov/data/2013/acs5/profile/variables/"+req.params.indicator+".json"
-  console.log(url);
-  request(url, function(error, response, body)
-  {
-    if(!error && response.statusCode === 200)
+    {
+    var array=[];
+    var array2 =[];
+    var url  = "http://api.census.gov/data/2012/acs5/profile?get="+req.params.indicator+"&for=county:*"+key;
+    var url2 = "http://api.census.gov/data/2013/acs5/profile?get="+req.params.indicator+"&for=zip+code+tabulation+area:*"+key;
+    var url3 = "http://api.census.gov/data/2013/acs5/profile/variables/"+req.params.indicator+".json"
+    console.log(url);
+
+    request(url, function(error, response, body)
       {
+      if(!error && response.statusCode === 200)
+        {
         var data = JSON.parse(body);
         data.forEach(function(fips)
-        {
-          var obj =
           {
+          var obj =
+            {
             id: fips[1]+fips[2],
             rate: parseFloat(fips[0])
-          }
+            };
           array.push(obj);
-        });
-        var county=data[1][1]+data[1][2];
+          });
+          var county=data[1][1]+data[1][2];
 
-        fs.writeFile("./public/"+req.params.indicator+".json",JSON.stringify(array),function(e)
-        {
-          console.log("done!");
-        })
+          fs.writeFile("./public/"+req.params.indicator+".json",JSON.stringify(array),function(e)
+            {
+            console.log("done!");
+            });
 
-        var lowest = Number.POSITIVE_INFINITY;
-        var highest = Number.NEGATIVE_INFINITY;
-        var tmp;
+          var lowest = Number.POSITIVE_INFINITY;
+          var highest = Number.NEGATIVE_INFINITY;
+          var tmp;
 
-        for(var i=array.length-1;i>=1;i--)
-          {
+          for(var i=array.length-1;i>=1;i--)
+            {
             tmp = array[i].rate;
             if(tmp < lowest) lowest=tmp;
             if(tmp > highest) highest =tmp;
-          }
+            }
 
           var obj_num =
-          {
+            {
             variable: req.params.indicator,
             min: lowest,
             max: highest
+            }
+            max_min.push(obj_num);
+            console.log("highest: "+highest,"lowest: "+lowest);
           }
-          max_min.push(obj_num);
-          console.log("highest: "+highest,"lowest: "+lowest);
-        }
-    });
+        console.log(max_min);
+        res.json(max_min);
+      });
+
     request(url2, function(error, response, body)
     {
       if(!error && response.statusCode === 200)
@@ -138,7 +147,7 @@ app.get('/:indicator',function(req, res)
       //       }
       //   });
       // });
-      res.sendFile(__dirname + '/public/us_map_indicators.html');
+
     };
 })
 
