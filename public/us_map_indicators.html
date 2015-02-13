@@ -18,9 +18,10 @@ path:hover{
   fill: #444;
 }
 
-text{
+text,li{
   font-family: "Calibri", Helvetica, Arial, sans-serif;
   font-size: 10px;
+  width: 40%;
 }
 
 .subunit-label{
@@ -31,15 +32,33 @@ text{
   text-anchor:middle;
 }
 
-/*.d3-tip {
-  line-height: 1;
-  font-weight: bold;
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  border-radius: 2px;
-}*/
+li{
+  background: rgba(0,153,76,.8);
+  margin: 5px;
+  color: white;
+  height: 50px;
+  width: 100%;
+}
 
+#container{
+  position: relative;
+}
+
+#leftdiv{
+  position: absolute;
+  margin-top: 2%;
+  width:20%;
+}
+
+svg{
+  float: left;
+  margin-left: 25%;
+}
+
+a{
+  text-decoration: none;
+  color: white;
+}
 
 .q0-9 { fill:#004F44; }
 .q1-9 { fill:#009B7C; }
@@ -66,6 +85,11 @@ text{
   font-family: "Calibri";
 }
 
+ul{
+  width: 100%;
+}
+
+
 </style>
 <body>
   <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -84,33 +108,44 @@ text{
   var div3 = document.createElement("div");
   div.appendChild(div3);
   div3.id="rightdiv";
-  var div4 = document.createElement("div");
-  div3.appendChild(div4);
-  div4.id="inputbar";
-  // var form = document.createElement("form")
-  // div4.appendChild(form);
-  var input = document.createElement("input");
-  div4.appendChild(input);
-  input.type="text";
-  input.placeholder="enter demographic";
-  input.id="textbox";
-  // input.name="demographic";
 
-  var input2 = document.createElement("input");
-  div4.appendChild(input2);
-  input2.type="submit";
-  input2.value="Add";
-  input2.id="button";
+  var nav = document.createElement("ul");
+  div2.appendChild(nav);
 
-  input2.addEventListener("click",function()
+  var array = [];
+  var counter = -1;
+
+  var xhr1 = new XMLHttpRequest();
+  xhr1.open("GET","http://localhost:3000/variables");
+
+  xhr1.addEventListener("load",function(e)
   {
+  var d = xhr1.responseText;
+  var parsed = JSON.parse(d);
+  console.log(parsed);
+    parsed.forEach(function(object)
+    {
+      var li = document.createElement("li");
+      nav.appendChild(li);
+      var a = document.createElement("a");
+      li.appendChild(a);
+      // a.href="/"+object.id;
+      a.innerText = object.concept+" : \n"+ object.label;
+      li.setAttribute("class",object.id);
+      li.addEventListener("click", function()
+      {
+        array.push(object.id);
+        createPage();
+        counter ++;
+      })
+    });
+  });
+  xhr1.send();
 
-  var safeURL = input.value.replace(" ","+");
-  var file = safeURL;
-
+var createPage = function()
+{
   var width=960;
   var height =650;
-
   var xhr = new XMLHttpRequest();
   xhr.open("GET","http://localhost:3000/nums");
   xhr.send();
@@ -128,7 +163,7 @@ text{
   .domain([parsed[0].min,parsed[0].max])
   .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
-  var svg = d3.select("body").append("svg")
+  var svg = d3.select("#container").append("svg")
   .attr("width",width)
   .attr("height",height);
 
@@ -151,13 +186,11 @@ text{
 
   queue()
   .defer(d3.json,"./us_counties_fips.json")
-  .defer(d3.json,file+".json")
+  .defer(d3.json,array[counter]+".json")
   .await(ready);
 
   function ready(err,usa,json)
   {
-    console.log(usa);
-    console.log(json);
     json.forEach(function(obj)
     {
       rateById.set(obj.id,+obj.rate);
@@ -194,8 +227,6 @@ text{
     })
     .attr("id","tooltip");
 
-
-
     svg.selectAll(".place-label")
     .data(topojson.feature(usa,usa.objects.places_usa).features)
     .enter().append("text")
@@ -205,29 +236,10 @@ text{
     .attr("dy",".35em")
     .style("text-anchor", function(d){ return d.geometry.coordinates[0] > -1? "start": "end";})
     .text(function(d) { return d.properties.name;});
-    // var subunits = topojson.feature(usa, usa.objects.subunits_usa);
-    //
-    // var projection = d3.geo.albersUsa()
-    // // .center([0,55.4])
-    // // .rotate([100,0])
-    // // .parallels([50,60])
-    // // .scale(1000)
-    // //.translate([width/2, height/2]);
-    //
-    // var path = d3.geo.path()
-    // .projection(projection);
-    //
-    // svg.append("path")
-    //  .datum(subunits)
-    //  .attr("d", path);
-
-
-
-
-    console.log(usa);
 
   };
 });
-});
+};
+
   </script>
 </body>

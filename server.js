@@ -9,12 +9,21 @@ app.use(express.static(__dirname + '/public'));
 fs.readFile("./key.txt",function(e,data)
 {
   var key = data.toString();
-  var url = "http://api.census.gov/data/2012/acs5/profile?get=DP03_0062E&for=county:*"+key;
 
 app.get('/nums', function(req, res)
 {
   res.json(max_min);
-})
+});
+
+app.get('/variables', function(req,res)
+{
+  fs.readFile("./public/variables.json",function(e,data)
+  {
+    // var variables = data.toString();
+    var variables = JSON.parse(data);
+    res.json(variables);
+  });
+});
 
 app.get('/:indicator',function(req, res)
 {
@@ -60,6 +69,7 @@ app.get('/:indicator',function(req, res)
 
           var obj_num =
           {
+            variable: req.params.indicator,
             min: lowest,
             max: highest
           }
@@ -102,41 +112,35 @@ app.get('/:indicator',function(req, res)
           }
       });
 
-      fs.readFile("./public/variables.json",function(e,data)
-      {
-        var read = JSON.parse(data);
-
-      request(url3, function(error, response, body)
-      {
-        if(!error && response.statusCode === 200)
-          {
-            var data = JSON.parse(body);
-            console.log(data.name);
-            var obj =
-            {
-              id: data.name,
-              concept: data.concept,
-              label: data.label
-            }
-            read.push(obj);
-
-            fs.writeFile("./public/variables.json", JSON.stringify(read),function(e)
-            {
-              console.log("Variable added!");
-            })
-
-            }
-        });
-      });
-
+      // fs.readFile("./public/variables.json",function(e,data)
+      // {
+      //   var read = JSON.parse(data);
+      //
+      // request(url3, function(error, response, body)
+      // {
+      //   if(!error && response.statusCode === 200)
+      //     {
+      //       var data = JSON.parse(body);
+      //       console.log(data.name);
+      //       var obj =
+      //       {
+      //         id: data.name,
+      //         concept: data.concept,
+      //         label: data.label
+      //       }
+      //       read.push(obj);
+      //
+      //       fs.writeFile("./public/variables.json", JSON.stringify(read),function(e)
+      //       {
+      //         console.log("Variable added!");
+      //       })
+      //
+      //       }
+      //   });
+      // });
       res.sendFile(__dirname + '/public/us_map_indicators.html');
-
     };
-
 })
-
-
-
 
 
 });
