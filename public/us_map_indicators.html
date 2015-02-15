@@ -33,11 +33,14 @@ text,li{
 }
 
 li{
-  background: rgba(0,153,76,.8);
+  background: rgba(68,152,255,.8);
   margin: 5px;
   color: white;
   height: 50px;
   width: 100%;
+}
+a:hover,li:hover{
+  background: rgb(28,103,255);
 }
 
 #container{
@@ -122,7 +125,6 @@ ul{
     {
     var d = xhr1.responseText;
     var parsed = JSON.parse(d);
-    console.log(parsed);
     parsed.forEach(function(object)
       {
       var li = document.createElement("li");
@@ -136,8 +138,6 @@ ul{
         {
         array.push(object.id);
         createPage();
-
-        console.log(array);
         })
       });
     });
@@ -146,7 +146,7 @@ ul{
   var width=960;
   var height =650;
 
-  var svg = d3.select("#container").append("svg")
+  var svg = d3.select("#rightdiv").append("svg")
   .attr("width",width)
   .attr("height",height);
 
@@ -160,9 +160,6 @@ ul{
       {
       var d = xhr.responseText;
       var parsed = JSON.parse(d);
-      console.log(parsed);
-      console.log(parsed[counter].min);
-      console.log(parsed[counter].max);
 
       var rateById = d3.map();
 
@@ -187,13 +184,14 @@ ul{
       .style('width','100px')
       .style('text-align','center')
 
-      console.log(counter);
+      var header = d3.select('#rightdiv').append('h1');
+      var cntyselect = d3.select('#rightdiv').append('h2');
+
       queue()
       .defer(d3.json,"./us_counties_fips.json")
       .defer(d3.json,array[counter]+".json")
       .await(ready);
       counter ++;
-
 
       function ready(err,usa,json)
         {
@@ -207,7 +205,10 @@ ul{
         .data(topojson.feature(usa,usa.objects.counties).features)
         .enter().append("path")
         .attr("class",function(d){return quantize(rateById.get(d.id))})
+
         .attr("d",path)
+
+
         .on('click', function(d)
           {
           var test = rateById.get(d.id);
@@ -215,7 +216,7 @@ ul{
           var pathclick = d3.selectAll('path');
           pathclick.attr("class",function(d){ if (rateById.get(d.id) >= test){ return quantize(rateById.get(d.id))}})
           })
-        .on('mouseover', function(d)
+        .on('mousemove', function(d)
           {
           tooltip.transition()
           .style('opacity', .9)
@@ -224,7 +225,8 @@ ul{
           .style('top',  (d3.event.pageY - 30) + 'px')
           tempColor = this.style.fill;
           d3.select(this)
-          .style('opacity', .5)
+          .style('opacity', .5);
+          header.html(d.properties.name+" : "+rateById.get(d.id));
           })
         .on('mouseout', function(d)
           {
@@ -234,6 +236,8 @@ ul{
           })
         .attr("id","tooltip");
 
+
+
         svg.selectAll(".place-label")
         .data(topojson.feature(usa,usa.objects.places_usa).features)
         .enter().append("text")
@@ -242,10 +246,15 @@ ul{
         .attr("x", function(d){ return d.geometry.coordinates[0] > -1? 6: -6;})
         .attr("dy",".35em")
         .style("text-anchor", function(d){ return d.geometry.coordinates[0] > -1? "start": "end";})
-        .text(function(d) { return d.properties.name;});
+        .text(function(d) { return d.properties.name;})
+
+        .data(usa)
+        .exit()
+        .remove();
         };
       });
       // counter ++;
+
     };
 
   </script>
