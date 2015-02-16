@@ -34,22 +34,25 @@ text,li{
 
 li{
   background: rgba(68,152,255,.8);
+  text-align: center;
+}
+
+.first_select{
+  background: rgba(68,152,255,.8);
   margin: 5px;
   padding: 5px 5px 5px 5px;
   color: white;
   height: 50px;
   width:100%;
-}
-.first_select{
   display:inline;
 }
 a:hover,li:hover{
   background: rgb(28,103,255);
 }
 
-#container{
+/*#container{
   position: relative;
-}
+}*/
 
 #leftdiv{
   position: absolute;
@@ -57,9 +60,9 @@ a:hover,li:hover{
   width:20%;
 }
 
-#rightdiv{
+/*#rightdiv{
   height: 100%;
-}
+}*/
 
 .rightnav{
   width: 25%;
@@ -108,8 +111,69 @@ ul{
 .subcategory{
   position:absolute;
   width: 20%;
-  height: 100%;
+  /*height: 100%;*/
   float: left;
+}
+
+.li_indic3{
+  margin-bottom: 5px;
+}
+
+.click-nav {
+  margin:20px;
+  width:200px;
+  position:absolute;
+}
+.click-nav ul {
+  font-weight:900;
+  width:100%;
+}
+.click-nav ul li {
+  /*position:relative;*/
+  list-style:none;
+  cursor:pointer;
+}
+.click-nav ul li ul {
+  position:absolute;
+  left:0;
+  right:0;
+}
+.click-nav ul .clicker {
+  background:#2284B5;
+  color:#FFF;
+  margin-bottom: 5px;
+  width:60%;
+  height: 60px;
+}
+.click-nav ul .clicker:hover,
+.click-nav ul .active {
+  background:#196F9A;
+}
+
+.click-nav ul li a {
+  transition:background-color 0.2s ease-in-out;
+  -webkit-transition:background-color 0.2s ease-in-out;
+  -moz-transition:background-color 0.2s ease-in-out;
+  display:block;
+  padding:8px 10px 8px 40px;
+  background:#FFF;
+  color:#333;
+  text-decoration:none;
+}
+
+div{
+  display: inline-block;
+}
+.click-nav ul li a:hover {
+  background:#F2F2F2;
+}
+/* Fallbacks */
+.click-nav .no-js ul {
+  display:none;
+  margin-left: 130px;
+}
+.click-nav .no-js:hover ul {
+  display:block;
 }
 
 
@@ -120,6 +184,25 @@ ul{
   <script src="http://d3js.org/topojson.v1.min.js"></script>
   <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
   <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+    $(function() {
+      // Clickable Dropdown
+      $('.click-nav > ul').toggleClass('no-js js');
+      $('.click-nav .js ul').hide();
+      $('.click-nav .js').click(function(e) {
+        $('.click-nav .js ul').slideToggle(200);
+        $('.clicker').toggleClass('active');
+        e.stopPropagation();
+      });
+      $(document).click(function() {
+        if ($('.click-nav .js ul').is(':visible')) {
+          $('.click-nav .js ul', this).slideUp();
+          $('.clicker').removeClass('active');
+        }
+      });
+    });
+    </script>
   <script>
 
   var body = document.querySelector("body");
@@ -158,38 +241,44 @@ ul{
       li.setAttribute("class","first_select");
       li.addEventListener("click", function()
         {
+        var click_nav = document.createElement("div");
+        div3.appendChild(click_nav);
+        click_nav.setAttribute("class","click-nav");
+
         var ul2 = document.createElement("ul");
-        div3.appendChild(ul2);
+        ul2.setAttribute("class", "no-js");
+        click_nav.appendChild(ul2);
         var list = _.filter(parsed, function(o){return o.short===category;});
         var indicator1 = _.uniq(_.map(list, function(o){return o.indicator1;}));
+
         indicator1.forEach(function(subcat)
         {
 
           var li2 = document.createElement("li");
-          ul2.setAttribute("class", "subcategory");
-          ul2.appendChild(li2);
-          li2.setAttribute("class","sub_cat_li")
-          li2.innerText=subcat;
-          var indicator2 = _.uniq(_.map(list, function(o){return o.indicator2;}));
-          var indicator3 = _.uniq(_.map(list, function(o){return o.indicator3;}));
 
+          ul2.appendChild(li2);
+          li2.setAttribute("class","clicker")
+          li2.innerText=subcat;
+          var indicator3 = _.uniq(_.map(list, function(o){return o.indicator3;}));
+          var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
+          console.log(indicator4);
           var ul3 = document.createElement("ul");
           li2.addEventListener("click", function()
           {
-            li2.style.display = li2.style.display !== 'none' ? '' : 'none';
-            var lis = document.querySelector("li");
-            lis.style.display="none";
-
-            indicator2.forEach(function(detail)
+          var test =  _.where(parsed, {short:category, indicator1:subcat});
+            indicator3.forEach(function(detail)
             {
+              console.log(test);
+              console.log(detail);
               li2.appendChild(ul3);
               var li3 = document.createElement("li");
               ul3.appendChild(li3);
               li3.innerText=detail;
+              li3.setAttribute("class","li_indic3");
             })
           });
         });
-        // console.log(list);
+        console.log(list);
         // console.log(_.map(list, function(o){return o.indicator1;}));
         // console.log(_.uniq(_.map(list, function(o){return o.indicator2;})));
         // createPage();
