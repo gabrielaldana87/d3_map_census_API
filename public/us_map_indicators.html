@@ -35,9 +35,13 @@ text,li{
 li{
   background: rgba(68,152,255,.8);
   margin: 5px;
+  padding: 5px 5px 5px 5px;
   color: white;
   height: 50px;
-  width: 100%;
+  width:100%;
+}
+.first_select{
+  display:inline;
 }
 a:hover,li:hover{
   background: rgb(28,103,255);
@@ -51,6 +55,15 @@ a:hover,li:hover{
   position: absolute;
   margin-top: 2%;
   width:20%;
+}
+
+#rightdiv{
+  height: 100%;
+}
+
+.rightnav{
+  width: 25%;
+  float: right;
 }
 
 svg{
@@ -89,7 +102,14 @@ a{
 }
 
 ul{
-  width: 100%;
+
+}
+
+.subcategory{
+  position:absolute;
+  width: 20%;
+  height: 100%;
+  float: left;
 }
 
 
@@ -99,6 +119,7 @@ ul{
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v1.min.js"></script>
   <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+  <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
   <script>
 
   var body = document.querySelector("body");
@@ -113,7 +134,8 @@ ul{
   div3.id="rightdiv";
 
   var nav = document.createElement("ul");
-  div2.appendChild(nav);
+  div3.appendChild(nav);
+  nav.setAttribute("class", "rightnav");
 
   var array = [];
   var counter = 0;
@@ -124,20 +146,54 @@ ul{
   xhr1.addEventListener("load",function(e)
     {
     var d = xhr1.responseText;
-    var parsed = JSON.parse(d);
-    parsed.forEach(function(object)
+    window.parsed = JSON.parse(d);
+    var arr_short = _.uniq(_.map(parsed, function(o){return o.short}));
+    arr_short.forEach(function(category)
       {
       var li = document.createElement("li");
       nav.appendChild(li);
       var a = document.createElement("a");
       li.appendChild(a);
-      // a.href="/"+object.id;
-      a.innerText = object.concept+" : \n"+ object.label;
-      li.setAttribute("class",object.id);
+      a.innerText = category;
+      li.setAttribute("class","first_select");
       li.addEventListener("click", function()
         {
-        array.push(object.id);
-        createPage();
+        var ul2 = document.createElement("ul");
+        div3.appendChild(ul2);
+        var list = _.filter(parsed, function(o){return o.short===category;});
+        var indicator1 = _.uniq(_.map(list, function(o){return o.indicator1;}));
+        indicator1.forEach(function(subcat)
+        {
+
+          var li2 = document.createElement("li");
+          ul2.setAttribute("class", "subcategory");
+          ul2.appendChild(li2);
+          li2.setAttribute("class","sub_cat_li")
+          li2.innerText=subcat;
+          var indicator2 = _.uniq(_.map(list, function(o){return o.indicator2;}));
+          var indicator3 = _.uniq(_.map(list, function(o){return o.indicator3;}));
+
+          var ul3 = document.createElement("ul");
+          li2.addEventListener("click", function()
+          {
+            li2.style.display = li2.style.display !== 'none' ? '' : 'none';
+            var lis = document.querySelector("li");
+            lis.style.display="none";
+
+            indicator2.forEach(function(detail)
+            {
+              li2.appendChild(ul3);
+              var li3 = document.createElement("li");
+              ul3.appendChild(li3);
+              li3.innerText=detail;
+            })
+          });
+        });
+        // console.log(list);
+        // console.log(_.map(list, function(o){return o.indicator1;}));
+        // console.log(_.uniq(_.map(list, function(o){return o.indicator2;})));
+        // createPage();
+
         })
       });
     });
@@ -149,6 +205,7 @@ ul{
   var svg = d3.select("#rightdiv").append("svg")
   .attr("width",width)
   .attr("height",height);
+
 
   var createPage = function()
     {
