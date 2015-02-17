@@ -71,7 +71,7 @@ a:hover,li:hover{
 
 svg{
   float: left;
-  margin-left: 25%;
+  margin-left: 15%;
 }
 
 a{
@@ -117,6 +117,14 @@ ul{
 
 .li_indic3{
   margin-bottom: 5px;
+  height:30px;
+}
+
+.li_indic4{
+  margin-bottom: 5px;
+  height:30px;
+  margin-left: -40px;
+  display: inside;
 }
 
 .click-nav {
@@ -239,11 +247,14 @@ div{
       li.appendChild(a);
       a.innerText = category;
       li.setAttribute("class","first_select");
+      var click_nav = document.createElement("div");
+      click_nav.setAttribute("class","click-nav");
+
       li.addEventListener("click", function()
         {
-        var click_nav = document.createElement("div");
+
         div3.appendChild(click_nav);
-        click_nav.setAttribute("class","click-nav");
+
 
         var ul2 = document.createElement("ul");
         ul2.setAttribute("class", "no-js");
@@ -253,9 +264,7 @@ div{
 
         indicator1.forEach(function(subcat)
         {
-
           var li2 = document.createElement("li");
-
           ul2.appendChild(li2);
           li2.setAttribute("class","clicker")
           li2.innerText=subcat;
@@ -263,25 +272,44 @@ div{
           var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
           console.log(indicator4);
           var ul3 = document.createElement("ul");
+          ul3.setAttribute("class", "no-js");
           li2.addEventListener("click", function()
           {
-          var test =  _.where(parsed, {short:category, indicator1:subcat});
-            indicator3.forEach(function(detail)
+          var drilldown =  _.where(parsed, {short:category, indicator1:subcat});
+          var filtered = _.uniq(_.map(drilldown, function(o){return o.indicator2;}));
+            filtered.forEach(function(detail)
             {
-              console.log(test);
-              console.log(detail);
+              console.log(filtered);
               li2.appendChild(ul3);
               var li3 = document.createElement("li");
+              li3.setAttribute("class","no-js");
               ul3.appendChild(li3);
+              var subdrill = _.where(parsed,{short: category, indicator1: subcat, indicator2: detail});
               li3.innerText=detail;
+              var ul = document.createElement("ul");
+              li3.appendChild(ul);
+              subdrill.forEach(function(sub_detail)
+              {
+
+                var li_4 = document.createElement("li");
+                ul.appendChild(li_4);
+                li_4.innerText = sub_detail.indicator3;
+                li_4.setAttribute("class","li_indic4");
+
+                li_4.addEventListener("click", function()
+                {
+                array.push(sub_detail.c_id);
+                createPage();
+                });
+              });
               li3.setAttribute("class","li_indic3");
-            })
+            });
           });
         });
         console.log(list);
         // console.log(_.map(list, function(o){return o.indicator1;}));
         // console.log(_.uniq(_.map(list, function(o){return o.indicator2;})));
-        // createPage();
+
 
         })
       });
