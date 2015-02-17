@@ -60,6 +60,10 @@ a:hover,li:hover{
   width:20%;
 }
 
+.not_selected{
+  display: none;
+
+}
 /*#rightdiv{
   height: 100%;
 }*/
@@ -209,6 +213,7 @@ div{
           $('.clicker').removeClass('active');
         }
       });
+      $('click-nav .js ul').toggle();
     });
     </script>
   <script>
@@ -248,70 +253,104 @@ div{
       a.innerText = category;
       li.setAttribute("class","first_select");
       var click_nav = document.createElement("div");
-      click_nav.setAttribute("class","click-nav");
+      click_nav.setAttribute("class","click-nav"+" "+category+" "+"not_selected");
+      div3.appendChild(click_nav);
+      var ul2 = document.createElement("ul");
+      ul2.setAttribute("class", "no-js");
+      click_nav.appendChild(ul2);
+      var list = _.filter(parsed, function(o){return o.short===category;});
+      var indicator1 = _.uniq(_.map(list, function(o){return o.indicator1;}));
 
-      li.addEventListener("click", function()
+
+//remove starting from here
+      indicator1.forEach(function(subcat)
         {
+        var li2 = document.createElement("li");
+        li2.setAttribute("class","clicker");
+        li2.innerText=subcat;
 
-        div3.appendChild(click_nav);
-
-
-        var ul2 = document.createElement("ul");
-        ul2.setAttribute("class", "no-js");
-        click_nav.appendChild(ul2);
-        var list = _.filter(parsed, function(o){return o.short===category;});
-        var indicator1 = _.uniq(_.map(list, function(o){return o.indicator1;}));
-
-        indicator1.forEach(function(subcat)
-        {
-          var li2 = document.createElement("li");
-          ul2.appendChild(li2);
-          li2.setAttribute("class","clicker")
-          li2.innerText=subcat;
-          var indicator3 = _.uniq(_.map(list, function(o){return o.indicator3;}));
-          var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
-          console.log(indicator4);
-          var ul3 = document.createElement("ul");
-          ul3.setAttribute("class", "no-js");
-          li2.addEventListener("click", function()
+        li.addEventListener("click", function()
           {
-          var drilldown =  _.where(parsed, {short:category, indicator1:subcat});
-          var filtered = _.uniq(_.map(drilldown, function(o){return o.indicator2;}));
-            filtered.forEach(function(detail)
+          var selector = document.querySelectorAll("."+category);
+          if (selector)
             {
-              console.log(filtered);
-              li2.appendChild(ul3);
-              var li3 = document.createElement("li");
-              li3.setAttribute("class","no-js");
-              ul3.appendChild(li3);
-              var subdrill = _.where(parsed,{short: category, indicator1: subcat, indicator2: detail});
-              li3.innerText=detail;
-              var ul = document.createElement("ul");
-              li3.appendChild(ul);
-              subdrill.forEach(function(sub_detail)
-              {
+              selector[0].className="click-nav"+" "+category+" "+"selected";
 
-                var li_4 = document.createElement("li");
-                ul.appendChild(li_4);
-                li_4.innerText = sub_detail.indicator3;
-                li_4.setAttribute("class","li_indic4");
-
-                li_4.addEventListener("click", function()
+              var not_select = document.querySelectorAll(".click-nav");
+              for(i=0; i<not_select.length;i++)
                 {
-                array.push(sub_detail.c_id);
-                createPage();
-                });
-              });
-              li3.setAttribute("class","li_indic3");
-            });
+                if(not_select[i].className!==selector[0].className)
+                  {
+                  not_select[i].className="click-nav"+" "+not_select[i].classList[1]+" "+"not_selected";
+                  }
+                }
+            }
+        ul2.appendChild(li2);
           });
         });
-        console.log(list);
-        // console.log(_.map(list, function(o){return o.indicator1;}));
-        // console.log(_.uniq(_.map(list, function(o){return o.indicator2;})));
 
 
-        })
+
+//remove above this line
+
+      // li.addEventListener("click", function()
+      //   {
+        //
+        // div3.appendChild(click_nav);
+        //
+        // var ul2 = document.createElement("ul");
+        // ul2.setAttribute("class", "no-js");
+        // click_nav.appendChild(ul2);
+        // var list = _.filter(parsed, function(o){return o.short===category;});
+        // var indicator1 = _.uniq(_.map(list, function(o){return o.indicator1;}));
+        //
+        // indicator1.forEach(function(subcat)
+        // {
+        //   var li2 = document.createElement("li");
+        //   ul2.appendChild(li2);
+        //   li2.setAttribute("class","clicker")
+        //   li2.innerText=subcat;
+        //   var indicator3 = _.uniq(_.map(list, function(o){return o.indicator3;}));
+        //   var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
+        //   console.log(indicator4);
+        //   var ul3 = document.createElement("ul");
+        //   ul3.setAttribute("class", "no-js");
+        //   li2.addEventListener("click", function()
+        //   {
+        //   var drilldown =  _.where(parsed, {short:category, indicator1:subcat});
+        //   var filtered = _.uniq(_.map(drilldown, function(o){return o.indicator2;}));
+        //     filtered.forEach(function(detail)
+        //     {
+        //       console.log(filtered);
+        //       li2.appendChild(ul3);
+        //       var li3 = document.createElement("li");
+        //       li3.setAttribute("class","no-js");
+        //       ul3.appendChild(li3);
+        //       var subdrill = _.where(parsed,{short: category, indicator1: subcat, indicator2: detail});
+        //       li3.innerText=detail;
+        //       var ul = document.createElement("ul");
+        //       li3.appendChild(ul);
+        //       subdrill.forEach(function(sub_detail)
+        //       {
+        //
+        //         var li_4 = document.createElement("li");
+        //         ul.appendChild(li_4);
+        //         li_4.innerText = sub_detail.indicator3;
+        //         li_4.setAttribute("class","li_indic4");
+        //
+        //         li_4.addEventListener("click", function()
+        //         {
+        //         array.push(sub_detail.c_id);
+        //         createPage();
+        //
+        //         });
+        //       });
+        //       li3.setAttribute("class","li_indic3");
+        //     });
+        //   });
+        // });
+        // console.log(list);
+        // })
       });
     });
   xhr1.send();
@@ -392,8 +431,7 @@ div{
           })
         .on('mousemove', function(d)
           {
-          tooltip.transition()
-          .style('opacity', .9)
+
           tooltip.html(d.properties.name+" : "+rateById.get(d.id))
           .style('left', (d3.event.pageX - 35) + 'px')
           .style('top',  (d3.event.pageY - 30) + 'px')
@@ -410,8 +448,6 @@ div{
           })
         .attr("id","tooltip");
 
-
-
         svg.selectAll(".place-label")
         .data(topojson.feature(usa,usa.objects.places_usa).features)
         .enter().append("text")
@@ -422,9 +458,11 @@ div{
         .style("text-anchor", function(d){ return d.geometry.coordinates[0] > -1? "start": "end";})
         .text(function(d) { return d.properties.name;})
 
-        .data(usa)
-        .exit()
-        .remove();
+        var remove = document.querySelectorAll("#no-js");
+        remove.forEach(function(li)
+        {
+          li.style.display="none";
+        })
         };
       });
       // counter ++;
