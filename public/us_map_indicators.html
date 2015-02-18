@@ -121,7 +121,7 @@ ul{
 
 .li_indic3{
   margin-bottom: 5px;
-  height:30px;
+  height:100%;
 }
 
 .li_indic4{
@@ -155,7 +155,7 @@ ul{
   color:#FFF;
   margin-bottom: 5px;
   width:60%;
-  height: 60px;
+  height: 70px;
 }
 .click-nav ul .clicker:hover,
 .click-nav ul .active {
@@ -163,9 +163,9 @@ ul{
 }
 
 .click-nav ul li a {
-  transition:background-color 0.2s ease-in-out;
-  -webkit-transition:background-color 0.2s ease-in-out;
-  -moz-transition:background-color 0.2s ease-in-out;
+  transition:background-color 0.5s ease-in-out;
+  -webkit-transition:background-color 0.5s ease-in-out;
+  -moz-transition:background-color 0.5s ease-in-out;
   display:block;
   padding:8px 10px 8px 40px;
   background:#FFF;
@@ -184,13 +184,23 @@ div{
   display:none;
   margin-left: 130px;
 }
-.click-nav .no-js:hover ul {
+
+.not_selected2 {
+  display:none !important;
+}
+.selected:hover ul {
   display:block;
 }
 
-.not_selected2{
+.click-nav .no-js ul .not_selected2{
   display: none;
 }
+
+.no-js ul
+
+/*.not_selected2:hover{
+  display: none;
+}*/
 
 </style>
 <body>
@@ -276,7 +286,6 @@ div{
           if (selector)
             {
               selector[0].className="click-nav"+" "+category+" "+"selected";
-
               var not_select = document.querySelectorAll(".click-nav");
               for(i=0; i<not_select.length;i++)
                 {
@@ -287,144 +296,56 @@ div{
                 }
             }
         ul2.appendChild(li2);
-
 // check starting from here:
+        var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
+        var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
+        var ul3 = document.createElement("ul");
+        ul3.setAttribute("class", "no-js"+" indicator2 "+subcat.substring(0,6)+" "+"not_selected2");
+        var drilldown =  _.where(parsed, {short:category, indicator1:subcat});
+        var filtered = _.uniq(_.map(drilldown, function(o){return o.indicator2;}));
+        li2.appendChild(ul3);
 
-  var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
-  var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
-  console.log(indicator4);
-  var ul3 = document.createElement("ul");
-  ul3.setAttribute("class", "no-js"+" indicator2 "+subcat.substring(0,6)+" "+"not_selected2");
-
-  var drilldown =  _.where(parsed, {short:category, indicator1:subcat});
-  var filtered = _.uniq(_.map(drilldown, function(o){return o.indicator2;}));
-
-  li2.appendChild(ul3);
-
-  li2.addEventListener("click", function()
-  {
-
-  var select_indic_2 = document.querySelector("."+subcat.substring(0,6));
-  console.log(ul3.className);
-
-  if(select_indic_2)
-  {
-    ul3.setAttribute("class","no-js"+" indicator2 "+subcat.substring(0,6)+" "+"selected");
-
-    var not_select_indic_2 = document.querySelectorAll(".indicator2");
-    console.log(not_select_indic_2);
-    for(i=0;i<not_select_indic_2.length;i++)
-    {
-      if(not_select_indic_2[i].className!==ul3.className)
-      {
-        console.log(not_select_indic_2[0].classList[2]);
-        not_select_indic_2[i].className="no-js"+" indicator2 "+not_select_indic_2[i].classList[2]+" "+"not_selected2"
-      }
-    }
-  }
-  console.log(ul3);
-    filtered.forEach(function(detail)
-        {
-          console.log(filtered);
-
-          var li3 = document.createElement("li");
-          li3.setAttribute("class","no-js");
-          ul3.appendChild(li3);
-          var subdrill = _.where(parsed,{short: category, indicator1: subcat, indicator2: detail});
-          li3.innerText=detail;
-          var ul = document.createElement("ul");
-          li3.appendChild(ul);
-          subdrill.forEach(function(sub_detail)
+        filtered.forEach(function(detail)
           {
-
-            var li_4 = document.createElement("li");
-            ul.appendChild(li_4);
-            li_4.innerText = sub_detail.indicator3;
-            li_4.setAttribute("class","li_indic4");
-
-            li_4.addEventListener("click", function()
-            {
-            array.push(sub_detail.c_id);
-            createPage();
-
-            });
+            var li3 = document.createElement("li");
+            li3.setAttribute("class","no-js");
+            var subdrill = _.where(parsed,{short: category, indicator1: subcat, indicator2: detail});
+            li3.innerText=detail;
+            var ul = document.createElement("ul");
+            li3.appendChild(ul);
+            subdrill.forEach(function(sub_detail)
+              {
+                var li_4 = document.createElement("li");
+                li2.addEventListener("click", function()
+                  {
+                    ul3.appendChild(li3);
+                    var select_indic_2 = document.querySelector("."+subcat.substring(0,6));
+                    if(select_indic_2)
+                      {
+                        ul3.setAttribute("class","no-js"+" indicator2 "+subcat.substring(0,6)+" "+"selected");
+                        var not_select_indic_2 = document.querySelectorAll(".indicator2");
+                        for(i=0;i<not_select_indic_2.length;i++)
+                          {
+                            if(not_select_indic_2[i].className!==ul3.className)
+                              {
+                                not_select_indic_2[i].className="no-js"+" indicator2 "+not_select_indic_2[i].classList[2]+" "+"not_selected2"
+                              }
+                          }
+                      }
+                    ul.appendChild(li_4);
+                    li_4.innerText = sub_detail.indicator3;
+                    li_4.setAttribute("class","li_indic4");
+                    li_4.addEventListener("click", function()
+                      {
+                        array.push(sub_detail.c_id);
+                        createPage(sub_detail.c_id);
+                      });
+                  });
+                li3.setAttribute("class","li_indic3");
+              });
           });
-          li3.setAttribute("class","li_indic3");
-        });
-    });
-
-
-
-
-// check above here:
           });
         });
-
-
-
-//remove above this line
-
-      // li.addEventListener("click", function()
-      //   {
-        //
-        // div3.appendChild(click_nav);
-        //
-        // var ul2 = document.createElement("ul");
-        // ul2.setAttribute("class", "no-js");
-        // click_nav.appendChild(ul2);
-        // var list = _.filter(parsed, function(o){return o.short===category;});
-        // var indicator1 = _.uniq(_.map(list, function(o){return o.indicator1;}));
-        //
-        // indicator1.forEach(function(subcat)
-        // {
-        //   var li2 = document.createElement("li");
-        //   ul2.appendChild(li2);
-        //   li2.setAttribute("class","clicker")
-        //   li2.innerText=subcat;
-
-  //         add the following code:
-
-        //   var indicator3 = _.uniq(_.map(list, function(o){return o.indicator3;}));
-        //   var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
-        //   console.log(indicator4);
-        //   var ul3 = document.createElement("ul");
-        //   ul3.setAttribute("class", "no-js");
-        //   li2.addEventListener("click", function()
-        //   {
-        //   var drilldown =  _.where(parsed, {short:category, indicator1:subcat});
-        //   var filtered = _.uniq(_.map(drilldown, function(o){return o.indicator2;}));
-        //     filtered.forEach(function(detail)
-        //     {
-        //       console.log(filtered);
-        //       li2.appendChild(ul3);
-        //       var li3 = document.createElement("li");
-        //       li3.setAttribute("class","no-js");
-        //       ul3.appendChild(li3);
-        //       var subdrill = _.where(parsed,{short: category, indicator1: subcat, indicator2: detail});
-        //       li3.innerText=detail;
-        //       var ul = document.createElement("ul");
-        //       li3.appendChild(ul);
-        //       subdrill.forEach(function(sub_detail)
-        //       {
-        //
-        //         var li_4 = document.createElement("li");
-        //         ul.appendChild(li_4);
-        //         li_4.innerText = sub_detail.indicator3;
-        //         li_4.setAttribute("class","li_indic4");
-        //
-        //         li_4.addEventListener("click", function()
-        //         {
-        //         array.push(sub_detail.c_id);
-        //         createPage();
-        //
-        //         });
-        //       });
-        //       li3.setAttribute("class","li_indic3");
-        //     });
-        //   });
-        // });
-        // console.log(list);
-        // })
       });
     });
   xhr1.send();
@@ -437,11 +358,11 @@ div{
   .attr("height",height);
 
 
-  var createPage = function()
+  var createPage = function(param)
     {
     var xhr = new XMLHttpRequest();
     console.log(counter);
-    xhr.open("GET","http://localhost:3000/"+array[counter]);
+    xhr.open("GET","http://localhost:3000/"+param);
     xhr.send();
     xhr.addEventListener("load",function(e)
       {
@@ -476,7 +397,7 @@ div{
 
       queue()
       .defer(d3.json,"./us_counties_fips.json")
-      .defer(d3.json,array[counter]+".json")
+      .defer(d3.json,param+".json")
       .await(ready);
       counter ++;
 
@@ -533,10 +454,6 @@ div{
         .text(function(d) { return d.properties.name;})
 
         var remove = document.querySelectorAll("#no-js");
-        remove.forEach(function(li)
-        {
-          li.style.display="none";
-        })
         };
       });
       // counter ++;
