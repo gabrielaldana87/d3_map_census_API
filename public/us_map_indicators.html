@@ -188,6 +188,9 @@ div{
   display:block;
 }
 
+.not_selected2{
+  display: none;
+}
 
 </style>
 <body>
@@ -261,8 +264,6 @@ div{
       var list = _.filter(parsed, function(o){return o.short===category;});
       var indicator1 = _.uniq(_.map(list, function(o){return o.indicator1;}));
 
-
-//remove starting from here
       indicator1.forEach(function(subcat)
         {
         var li2 = document.createElement("li");
@@ -286,6 +287,76 @@ div{
                 }
             }
         ul2.appendChild(li2);
+
+// check starting from here:
+
+  var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
+  var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
+  console.log(indicator4);
+  var ul3 = document.createElement("ul");
+  ul3.setAttribute("class", "no-js"+" indicator2 "+subcat.substring(0,6)+" "+"not_selected2");
+
+  var drilldown =  _.where(parsed, {short:category, indicator1:subcat});
+  var filtered = _.uniq(_.map(drilldown, function(o){return o.indicator2;}));
+
+  li2.appendChild(ul3);
+
+  li2.addEventListener("click", function()
+  {
+
+  var select_indic_2 = document.querySelector("."+subcat.substring(0,6));
+  console.log(ul3.className);
+
+  if(select_indic_2)
+  {
+    ul3.setAttribute("class","no-js"+" indicator2 "+subcat.substring(0,6)+" "+"selected");
+
+    var not_select_indic_2 = document.querySelectorAll(".indicator2");
+    console.log(not_select_indic_2);
+    for(i=0;i<not_select_indic_2.length;i++)
+    {
+      if(not_select_indic_2[i].className!==ul3.className)
+      {
+        console.log(not_select_indic_2[0].classList[2]);
+        not_select_indic_2[i].className="no-js"+" indicator2 "+not_select_indic_2[i].classList[2]+" "+"not_selected2"
+      }
+    }
+  }
+  console.log(ul3);
+    filtered.forEach(function(detail)
+        {
+          console.log(filtered);
+
+          var li3 = document.createElement("li");
+          li3.setAttribute("class","no-js");
+          ul3.appendChild(li3);
+          var subdrill = _.where(parsed,{short: category, indicator1: subcat, indicator2: detail});
+          li3.innerText=detail;
+          var ul = document.createElement("ul");
+          li3.appendChild(ul);
+          subdrill.forEach(function(sub_detail)
+          {
+
+            var li_4 = document.createElement("li");
+            ul.appendChild(li_4);
+            li_4.innerText = sub_detail.indicator3;
+            li_4.setAttribute("class","li_indic4");
+
+            li_4.addEventListener("click", function()
+            {
+            array.push(sub_detail.c_id);
+            createPage();
+
+            });
+          });
+          li3.setAttribute("class","li_indic3");
+        });
+    });
+
+
+
+
+// check above here:
           });
         });
 
@@ -310,6 +381,9 @@ div{
         //   ul2.appendChild(li2);
         //   li2.setAttribute("class","clicker")
         //   li2.innerText=subcat;
+
+  //         add the following code:
+
         //   var indicator3 = _.uniq(_.map(list, function(o){return o.indicator3;}));
         //   var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
         //   console.log(indicator4);
