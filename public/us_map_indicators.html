@@ -113,6 +113,27 @@ li{
   text-align: center;
 }
 
+.headerdiv {
+position: absolute;
+margin-left: 420px;
+width: 300px;
+margin-right: auto;
+font-family: Calibri;
+text-align: center;
+}
+
+h2,h3,h4{
+  margin-top:0px;
+  margin-bottom:0px;
+}
+
+h2{
+  font-size: 18px;
+}
+h3,h4{
+  font-size: 16px;
+}
+
 .subcategory{
   position:absolute;
   width: 20%;
@@ -359,7 +380,7 @@ div .not_selected2 {
                       {
                         var array = [];
                         array.push(sub_detail.c_id);
-                        createPage(sub_detail.c_id);
+                        createPage(sub_detail);
                       });
                   });
                 li3.setAttribute("class","li_indic3");
@@ -383,13 +404,13 @@ div .not_selected2 {
     {
     var xhr = new XMLHttpRequest();
     console.log(counter);
-    xhr.open("GET","http://localhost:3000/"+param);
+    xhr.open("GET","http://localhost:3000/"+param.c_id);
     xhr.send();
     xhr.addEventListener("load",function(e)
       {
       var d = xhr.responseText;
       window.min_max = JSON.parse(d);
-      var domain = _.find(min_max, function(o){return o.variable===param;});
+      var domain = _.find(min_max, function(o){return o.variable===param.c_id;});
       var rateById = d3.map();
 
       var quantize = d3.scale.quantize()
@@ -414,12 +435,18 @@ div .not_selected2 {
       .style('text-align','center')
       .attr('class', 'selected_tooltip tooltip_divs')
 
-      var header = d3.select('#rightdiv').append('h1');
+      var headerdiv = d3.select('#rightdiv').append('div').attr('class','headerdiv');
+      var header1 = d3.select('.headerdiv').append('h1').attr('class','title_header');
+      var header2 = d3.select('.headerdiv').append('h2').attr('class','title_header');
+      var header3 = d3.select('.headerdiv').append('h3').attr('class','title_header');
+      var header4 = d3.select('.headerdiv').append('h4').attr('class','title_header');
+      var header5 = d3.select('.headerdiv').append('h5').attr('class','title_header');
+
       var cntyselect = d3.select('#rightdiv').append('h2');
 
       queue()
       .defer(d3.json,"./us_counties_fips.json")
-      .defer(d3.json,param+".json")
+      .defer(d3.json,param.c_id+".json")
       .await(ready);
       counter ++;
 
@@ -435,7 +462,6 @@ div .not_selected2 {
         .data(topojson.feature(usa,usa.objects.counties).features)
         .enter().append("path")
         .attr("class",function(d){return quantize(rateById.get(d.id))})
-
         .attr("d",path)
         .on('click', function(d)
           {
@@ -452,21 +478,31 @@ div .not_selected2 {
           tempColor = this.style.fill;
           d3.select(this)
           .style('opacity', .5);
-          header.html(d.properties.name+" : "+rateById.get(d.id))
-          .attr("id","tooltip");
           })
         .on('mouseout', function(d)
           {
           d3.select(this)
           .style('opacity',1)
           .style('fill',tempColor);
-
-          var all_tooltips = d3.selectAll(".tooltip_divs")
+          d3.selectAll(".tooltip_divs")
           .attr("class", "selected3 first_dataset");
-          });
+          })
+          .attr("id","tooltip");
 
-          d3.selectAll(".first_dataset")
-          .style('display','none');
+          header2.html(param.indicator1);
+          header3.html(param.indicator2);
+          header4.html(param.indicator3);
+
+
+          d3.selectAll('.title_header')
+          .attr("class", 'first_dataset');
+
+
+
+
+          // header5.html(if(param.indicator4==='null'){return '';} else {return param.indicator4;});
+
+          // header.html(d.properties.name+" : "+rateById.get(d.id))
 
         svg.selectAll(".place-label")
         .data(topojson.feature(usa,usa.objects.places_usa).features)
@@ -478,10 +514,13 @@ div .not_selected2 {
         .style("text-anchor", function(d){ return d.geometry.coordinates[0] > -1? "start": "end";})
         .text(function(d) { return d.properties.name;})
 
-        var remove = document.querySelectorAll("#no-js");
         };
+        d3.selectAll(".first_dataset")
+        .style('display','none');
+
       });
       // counter ++;
+
 
     };
 
