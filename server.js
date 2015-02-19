@@ -1,7 +1,15 @@
 var express = require('express');
 var request = require('request');
 var fs = require('fs');
+var bodyParser = require('body-parser');
+var sqlite3 = require("sqlite3").verbose();
+var cors = require('cors');
+
+var db = new sqlite3.Database("mapping.db");
+
 var app = express();
+app.use(cors());
+
 var max_min = [];
 
 app.use(express.static(__dirname + '/public'));
@@ -20,13 +28,22 @@ app.get('/nums', function(req, res)
   res.json(max_min);
 });
 
+// app.get('/variables', function(req,res)
+// {
+//   fs.readFile("./public/variables.json",function(e,data)
+//   {
+//     // var variables = data.toString();
+//     var variables = JSON.parse(data);
+//     res.json(variables);
+//   });
+// });
+
 app.get('/variables', function(req,res)
 {
-  fs.readFile("./public/variables.json",function(e,data)
+db.all("SELECT * FROM variables", function(err, rows)
   {
-    // var variables = data.toString();
-    var variables = JSON.parse(data);
-    res.json(variables);
+  if(err) {throw err;}
+  res.json(rows);
   });
 });
 

@@ -130,28 +130,21 @@ li.li_indic3 {
 }
 
 .li_indic4{
-  margin-bottom: 3px;
+  border-top: 3px solid white;
   height:30px;
-  margin-left: -40px;
+  margin-left: -150px;
   display: inside;
   width: 120px;
 }
 
 .li_indic3 {
-  margin-bottom: 70px;
+  margin-bottom: 78px;
 }
 
 .click-nav {
   margin:0px 0px 5px 0px;
   width:200px;
   position:absolute;
-}
-
-.li_indic4 {
-  height: 25px;
-  margin-left: -150px;
-  width: 120px
-  border-bottom: 3px solid white;
 }
 
 .click-nav ul {
@@ -208,10 +201,6 @@ div{
 }
 
 .not_selected2 {
-  display:none !important;
-}
-
-.not_selected3 {
   display:none !important;
 }
 
@@ -457,7 +446,6 @@ div .not_selected2 {
           })
         .on('mouseover', function(d)
           {
-
           tooltip.html(d.properties.name+" : "+rateById.get(d.id))
           .style('left', (d3.event.pageX - 35) + 'px')
           .style('top',  (d3.event.pageY - 30) + 'px')
@@ -471,15 +459,14 @@ div .not_selected2 {
           {
           d3.select(this)
           .style('opacity',1)
-          .style('fill',tempColor)
+          .style('fill',tempColor);
 
-          // d3.selectAll(".selected_tooltip")
-          // .attr('class','not_selected2');
+          var all_tooltips = d3.selectAll(".tooltip_divs")
+          .attr("class", "selected3 first_dataset");
+          });
 
-          })
-
-
-
+          d3.selectAll(".first_dataset")
+          .style('display','none');
 
         svg.selectAll(".place-label")
         .data(topojson.feature(usa,usa.objects.places_usa).features)
