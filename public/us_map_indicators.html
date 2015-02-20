@@ -128,10 +128,10 @@ h2,h3,h4{
 }
 
 h2{
-  font-size: 18px;
+  font-size: 16px;
 }
 h3,h4{
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .subcategory{
@@ -203,6 +203,15 @@ li.li_indic3 {
   background:#FFF;
   color:#333;
   text-decoration:none;
+}
+
+.county_comp{
+  position: absolute;
+  top: 60px;
+  right: 40px;
+  font-family: Calibri;
+  background-color: lightgrey;
+  width: 248px;
 }
 
 ul.no-js{
@@ -294,7 +303,7 @@ div .not_selected2 {
 
   xhr1.addEventListener("load",function(e)
     {
-    var array = [];
+    // var array = [];
     var d = xhr1.responseText;
     window.parsed = JSON.parse(d);
     var arr_short = _.uniq(_.map(parsed, function(o){return o.short}));
@@ -314,23 +323,6 @@ div .not_selected2 {
       click_nav.appendChild(ul2);
       var list = _.filter(parsed, function(o){return o.short===category;});
       var indicator1 = _.uniq(_.map(list, function(o){return o.indicator1;}));
-
-      function linkListener(){
-        var selected_4 = document.querySelector(".selected4");
-        console.log(selected_4);
-        // selected_4.onclick = shootFunction(param);
-        // createPage(param);
-      };
-
-      function shootFunction(param)
-      {
-        createPage(param);
-      };
-
-      function createStuff()
-      {
-
-      }
 
       indicator1.forEach(function(subcat)
         {
@@ -397,7 +389,6 @@ div .not_selected2 {
                     ul.appendChild(li_4);
                     li_4.innerText = sub_detail.indicator3;
 
-
                     li_4.onclick = function()
                     {
                             var select_li_4 = document.querySelector("."+sub_detail.c_id);
@@ -405,8 +396,6 @@ div .not_selected2 {
                             {
                               li_4.setAttribute("class","li_indic4 "+sub_detail.c_id+" selected4");
                               var not_select_li_4 = document.querySelectorAll(".li_indic4");
-                              console.log(not_select_li_4.length);
-                              console.log(sub_detail);
                               createPage(sub_detail);
 
                               for(i=0;i<not_select_li_4.length;i++)
@@ -414,46 +403,12 @@ div .not_selected2 {
                                 if(not_select_li_4[i].className!==li_4.className)
                                 {
                                   not_select_li_4[i].className="li_indic4 "+not_select_li_4[i].classList[1]+" not_select_li_4";
-
-
-                                  // createPage(sub_detail);
                                 };
                               };
                             };
-                          };
-                          // linkListener();
-
-
-
-
-
-                    // var selected_4 = document.querySelector("."+sub_detail.c_id);
-
-                    // li_4.addEventListener("click", function()
-                    //       {
-                    //         var select_li_4 = document.querySelector("."+sub_detail.c_id);
-                    //         if(select_li_4)
-                    //         {
-                    //           li_4.setAttribute("class","li_indic4 "+sub_detail.c_id+" selected4");
-                    //           var not_select_li_4 = document.querySelectorAll(".li_indic4");
-                    //           console.log(not_select_li_4.length);
-                    //           console.log(li_4.className);
-                    //
-                    //           for(i=0;i<not_select_li_4.length;i++)
-                    //           {
-                    //             if(not_select_li_4[i].className!==li_4.className)
-                    //             {
-                    //               not_select_li_4[i].className="li_indic4 "+not_select_li_4[i].classList[1]+" not_select_li_4";
-                    //               return linkListener(sub_detail);
-                    //             }
-                    //           }
-                    //         }
-                    //       })
-
-
+                    };
                 });
                 li3.setAttribute("class","li_indic3");
-
               });
           });
           });
@@ -514,7 +469,12 @@ div .not_selected2 {
       var header4 = d3.select('.headerdiv').append('h4').attr('class','title_header');
       var header5 = d3.select('.headerdiv').append('h5').attr('class','title_header');
 
-      var cntyselect = d3.select('#rightdiv').append('h2');
+      var cntyselect_div = d3.select('#rightdiv').append('div').attr('class','county_comp');
+      var cntyselect_text = d3.select('.county_comp').append('h2').attr('class','cntyselect_text').
+      style('font-size','11px')
+      .style('font-weight','normal')
+      .style('color','black')
+
 
       queue()
       .defer(d3.json,"./us_counties_fips.json")
@@ -540,6 +500,11 @@ div .not_selected2 {
           var paths = d3.select('path')
           var pathclick = d3.selectAll('path');
           pathclick.attr("class",function(d){ if (rateById.get(d.id) >= test){ return quantize(rateById.get(d.id))}})
+
+          cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates higher than '+d.properties.name+' County:')
+          .style('padding','5px 5px 5px 5px')
+          .attr("class","first_dataset");
+
           })
         .on('mouseover', function(d)
           {
@@ -549,6 +514,8 @@ div .not_selected2 {
           tempColor = this.style.fill;
           d3.select(this)
           .style('opacity', .5);
+
+
           })
         .on('mouseout', function(d)
           {
@@ -590,7 +557,7 @@ div .not_selected2 {
         .style('display','none');
 
       });
-      // counter ++;
+
 
 
     };
