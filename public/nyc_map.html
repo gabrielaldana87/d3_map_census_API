@@ -69,16 +69,16 @@ text{
   <script>
 
   var width = 1300,
-  height = 1400;
+  height = 1200;
 
   var rateById = d3.map();
 
   var quantize = d3.scale.quantize()
-  .domain([1,45])
+  .domain([1,76])
   .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
   var projection = d3.geo.mercator()
-  .center([-73.80, 40.8])
+  .center([-73.6867, 40.94])
   .scale(50000)
   .translate([(width) / 2, (height)/2]);
 
@@ -117,13 +117,16 @@ text{
     .data(topojson.feature(us,us.objects.zips_new_york_v2).features)
     .enter().append("path")
     .attr("class", function(d){return quantize(rateById.get(d.id))})
+    
     .attr("d", path)
     .on('click',function(d)
     {
       var rateclick = rateById.get(d.id);
       var paths = d3.select('path')
+
       var pathclick = d3.selectAll('path');
       pathclick.attr("class",function(d){ if (rateById.get(d.id) >= rateclick){ return quantize(rateById.get(d.id))}})
+
     })
     .on('mouseover', function(d) {
       tooltip.transition()
@@ -142,6 +145,7 @@ text{
       .style('fill',tempColor)
     })
     .attr("id","tooltip");
-  }
+
+  };
   </script>
 </body>

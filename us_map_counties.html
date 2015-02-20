@@ -74,11 +74,6 @@ text{
   .domain([9000, 101000])
   .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
-  var change = d3.scale.quantize()
-  .domain([9000, 101000])
-  .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
-
-  var clases = function(i){return i;}
 
   var svg = d3.select("body").append("svg")
   .attr("width",width)
@@ -133,7 +128,7 @@ text{
       var test = rateById.get(d.id);
       var paths = d3.select('path')
       var pathclick = d3.selectAll('path');
-      pathclick.attr("class",function(d){ if (rateById.get(d.id) >= test){ return change(rateById.get(d.id))}})
+      pathclick.attr("class",function(d){ if (rateById.get(d.id) <= test){ return quantize(rateById.get(d.id))}})
     })
     .on('mouseover', function(d) {
         tooltip.transition()

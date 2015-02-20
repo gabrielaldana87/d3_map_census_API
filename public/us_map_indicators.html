@@ -210,7 +210,7 @@ li.li_indic3 {
   top: 60px;
   right: 40px;
   font-family: Calibri;
-  background-color: lightgrey;
+  background-color: #F0F4F4;
   width: 248px;
 }
 
@@ -299,7 +299,7 @@ div .not_selected2 {
 
 
   var xhr1 = new XMLHttpRequest();
-  xhr1.open("GET","http://localhost:3000/variables");
+  xhr1.open("GET","http://gabriel.princesspeach.nyc:4000/variables");
 
   xhr1.addEventListener("load",function(e)
     {
@@ -431,7 +431,7 @@ div .not_selected2 {
   var createPage = function(param)
     {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET","http://localhost:3000/"+param.c_id);
+    xhr.open("GET","http://gabriel.princesspeach.nyc:4000/"+param.c_id);
     xhr.send();
     xhr.addEventListener("load",function(e)
       {
@@ -473,7 +473,9 @@ div .not_selected2 {
       var cntyselect_text = d3.select('.county_comp').append('h2').attr('class','cntyselect_text').
       style('font-size','11px')
       .style('font-weight','normal')
-      .style('color','black')
+      .style('color','black');
+
+      var higher = d3.select('rightdiv').append('div').attr('class','')
 
 
       queue()
@@ -496,15 +498,14 @@ div .not_selected2 {
         .attr("d",path)
         .on('click', function(d)
           {
+          cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates <strong class="higher">higher</strong> than '+d.properties.name+' County:')
+          .style('padding','5px 5px 5px 5px')
+          .attr("class","first_dataset");
+
           var test = rateById.get(d.id);
           var paths = d3.select('path')
           var pathclick = d3.selectAll('path');
           pathclick.attr("class",function(d){ if (rateById.get(d.id) >= test){ return quantize(rateById.get(d.id))}})
-
-          cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates higher than '+d.properties.name+' County:')
-          .style('padding','5px 5px 5px 5px')
-          .attr("class","first_dataset");
-
           })
         .on('mouseover', function(d)
           {
@@ -514,8 +515,6 @@ div .not_selected2 {
           tempColor = this.style.fill;
           d3.select(this)
           .style('opacity', .5);
-
-
           })
         .on('mouseout', function(d)
           {
@@ -535,12 +534,20 @@ div .not_selected2 {
           d3.selectAll('.title_header')
           .attr("class", 'first_dataset');
 
+          d3.select('.higher')
+          .on('click', function(d,evt)
+          {
+            var test = rateById.get(d.id);
+            d3.selectAll('path')
+            .attr("class",function(d){ if (rateById.get(d.id) <= test){ return quantize(rateById.get(d.id))}});
 
 
+            cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates lower than '+d.properties.name+' County:')
+            .style('padding','5px 5px 5px 5px')
+            .attr("class","first_dataset")
 
-          // header5.html(if(param.indicator4==='null'){return '';} else {return param.indicator4;});
+          });
 
-          // header.html(d.properties.name+" : "+rateById.get(d.id))
 
         svg.selectAll(".place-label")
         .data(topojson.feature(usa,usa.objects.places_usa).features)
@@ -557,8 +564,6 @@ div .not_selected2 {
         .style('display','none');
 
       });
-
-
 
     };
 
