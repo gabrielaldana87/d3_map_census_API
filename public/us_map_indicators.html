@@ -315,9 +315,10 @@ div .not_selected2 {
       var list = _.filter(parsed, function(o){return o.short===category;});
       var indicator1 = _.uniq(_.map(list, function(o){return o.indicator1;}));
 
-      function linkListener(param){
-        var selected_4 = document.querySelector("."+param.c_id);
-        selected_4.onclick = shootFunction(param);
+      function linkListener(){
+        var selected_4 = document.querySelector(".selected4");
+        console.log(selected_4);
+        // selected_4.onclick = shootFunction(param);
         // createPage(param);
       };
 
@@ -325,6 +326,11 @@ div .not_selected2 {
       {
         createPage(param);
       };
+
+      function createStuff()
+      {
+
+      }
 
       indicator1.forEach(function(subcat)
         {
@@ -392,28 +398,57 @@ div .not_selected2 {
                     li_4.innerText = sub_detail.indicator3;
 
 
-                    // var selected_4 = document.querySelector("."+sub_detail.c_id);
-
-                    li_4.addEventListener("click", function()
-                          {
+                    li_4.onclick = function()
+                    {
                             var select_li_4 = document.querySelector("."+sub_detail.c_id);
                             if(select_li_4)
                             {
                               li_4.setAttribute("class","li_indic4 "+sub_detail.c_id+" selected4");
                               var not_select_li_4 = document.querySelectorAll(".li_indic4");
                               console.log(not_select_li_4.length);
-                              console.log(li_4.className);
+                              console.log(sub_detail);
+                              createPage(sub_detail);
 
                               for(i=0;i<not_select_li_4.length;i++)
                               {
                                 if(not_select_li_4[i].className!==li_4.className)
                                 {
                                   not_select_li_4[i].className="li_indic4 "+not_select_li_4[i].classList[1]+" not_select_li_4";
-                                  array.push(sub_detail);
-                                }
-                              }
-                            }
-                          })
+
+
+                                  // createPage(sub_detail);
+                                };
+                              };
+                            };
+                          };
+                          // linkListener();
+
+
+
+
+
+                    // var selected_4 = document.querySelector("."+sub_detail.c_id);
+
+                    // li_4.addEventListener("click", function()
+                    //       {
+                    //         var select_li_4 = document.querySelector("."+sub_detail.c_id);
+                    //         if(select_li_4)
+                    //         {
+                    //           li_4.setAttribute("class","li_indic4 "+sub_detail.c_id+" selected4");
+                    //           var not_select_li_4 = document.querySelectorAll(".li_indic4");
+                    //           console.log(not_select_li_4.length);
+                    //           console.log(li_4.className);
+                    //
+                    //           for(i=0;i<not_select_li_4.length;i++)
+                    //           {
+                    //             if(not_select_li_4[i].className!==li_4.className)
+                    //             {
+                    //               not_select_li_4[i].className="li_indic4 "+not_select_li_4[i].classList[1]+" not_select_li_4";
+                    //               return linkListener(sub_detail);
+                    //             }
+                    //           }
+                    //         }
+                    //       })
 
 
                 });
