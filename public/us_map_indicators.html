@@ -287,14 +287,14 @@ div .not_selected2 {
   div3.appendChild(nav);
   nav.setAttribute("class", "rightnav");
 
-  var array = [];
-  var counter = 0;
+
 
   var xhr1 = new XMLHttpRequest();
   xhr1.open("GET","http://localhost:3000/variables");
 
   xhr1.addEventListener("load",function(e)
     {
+    var array = [];
     var d = xhr1.responseText;
     window.parsed = JSON.parse(d);
     var arr_short = _.uniq(_.map(parsed, function(o){return o.short}));
@@ -314,6 +314,17 @@ div .not_selected2 {
       click_nav.appendChild(ul2);
       var list = _.filter(parsed, function(o){return o.short===category;});
       var indicator1 = _.uniq(_.map(list, function(o){return o.indicator1;}));
+
+      function linkListener(param){
+        var selected_4 = document.querySelector("."+param.c_id);
+        selected_4.onclick = shootFunction(param);
+        // createPage(param);
+      };
+
+      function shootFunction(param)
+      {
+        createPage(param);
+      };
 
       indicator1.forEach(function(subcat)
         {
@@ -337,7 +348,6 @@ div .not_selected2 {
                 };
             };
         ul2.appendChild(li2);
-// check starting from here:
         var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
         var indicator4 = _.uniq(_.map(list, function(o){return o.indicator4;}));
         var ul3 = document.createElement("ul");
@@ -345,6 +355,8 @@ div .not_selected2 {
         var drilldown =  _.where(parsed, {short:category, indicator1:subcat});
         var filtered = _.uniq(_.map(drilldown, function(o){return o.indicator2;}));
         li2.appendChild(ul3);
+
+
 
         filtered.forEach(function(detail)
           {
@@ -354,9 +366,12 @@ div .not_selected2 {
             li3.innerText=detail;
             var ul = document.createElement("ul");
             li3.appendChild(ul);
+
+
             subdrill.forEach(function(sub_detail)
               {
                 var li_4 = document.createElement("li");
+                li_4.setAttribute("class","li_indic4 "+sub_detail.c_id+" not_select_li_4");
                 li2.addEventListener("click", function()
                   {
                     ul3.appendChild(li3);
@@ -375,21 +390,44 @@ div .not_selected2 {
                       };
                     ul.appendChild(li_4);
                     li_4.innerText = sub_detail.indicator3;
-                    li_4.setAttribute("class","li_indic4");
+
+
+                    // var selected_4 = document.querySelector("."+sub_detail.c_id);
+
                     li_4.addEventListener("click", function()
-                      {
-                        var array = [];
-                        array.push(sub_detail.c_id);
-                        createPage(sub_detail);
-                      });
-                  });
+                          {
+                            var select_li_4 = document.querySelector("."+sub_detail.c_id);
+                            if(select_li_4)
+                            {
+                              li_4.setAttribute("class","li_indic4 "+sub_detail.c_id+" selected4");
+                              var not_select_li_4 = document.querySelectorAll(".li_indic4");
+                              console.log(not_select_li_4.length);
+                              console.log(li_4.className);
+
+                              for(i=0;i<not_select_li_4.length;i++)
+                              {
+                                if(not_select_li_4[i].className!==li_4.className)
+                                {
+                                  not_select_li_4[i].className="li_indic4 "+not_select_li_4[i].classList[1]+" not_select_li_4";
+                                  array.push(sub_detail);
+                                }
+                              }
+                            }
+                          })
+
+
+                });
                 li3.setAttribute("class","li_indic3");
+
               });
           });
           });
         });
+
       });
+
     });
+  // createPage(array);
   xhr1.send();
 
   var width=960;
@@ -403,18 +441,17 @@ div .not_selected2 {
   var createPage = function(param)
     {
     var xhr = new XMLHttpRequest();
-    console.log(counter);
     xhr.open("GET","http://localhost:3000/"+param.c_id);
     xhr.send();
     xhr.addEventListener("load",function(e)
       {
       var d = xhr.responseText;
-      window.min_max = JSON.parse(d);
-      var domain = _.find(min_max, function(o){return o.variable===param.c_id;});
+      var min_max = JSON.parse(d);
+      var domain = _.find(min_max, function(o){return o.county_c_id===param.c_id;});
       var rateById = d3.map();
 
       var quantize = d3.scale.quantize()
-      .domain([domain.min,domain.max])
+      .domain([domain.county_min,domain.county_max])
       .range(d3.range(10).map(function(i){return "q"+i+"-9"}));
 
       var projection = d3.geo.albersUsa()
@@ -448,7 +485,6 @@ div .not_selected2 {
       .defer(d3.json,"./us_counties_fips.json")
       .defer(d3.json,param.c_id+".json")
       .await(ready);
-      counter ++;
 
       function ready(err,usa,json)
         {
