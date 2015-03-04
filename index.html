@@ -22,12 +22,98 @@
   shape-rendering: crispEdges;
 }
 
+.county_comp{
+  position: absolute;
+  top: 20px;
+  left: 150px;
+  font-family: Calibri;
+  background-color: #F0F4F4;
+  width: 248px;
+}
+
+.WEST{
+  fill: #F6AB36;
+}
+
+.SOUTHWEST{
+  fill: #26A65B;
+}
+
+.NORTHEAST{
+  fill: #2474A9;
+}
+
+.SOUTH{
+  fill:#663398;
+}
+
+.MIDWEST{
+  fill: #F72459;
+}
+
+
+h2{
+  margin-top:0px;
+  margin-bottom:0px;
+  line-height:10px;
+}
+
+svg{
+  background: #F0F4F4;
+}
+
+.mouseover{
+  fill: grey;
+}
+
+#container{
+
+}
+
+#rightdiv{
+  float: left;
+}
+
+#leftdiv{
+  float: left;
+}
+
+li{
+  font: 10px sans-serif;
+  list-style: none;
+  background: rgba(68,152,255,.6);
+  text-align: center;
+  border-bottom: 1px solid white;
+}
+
+li:hover{
+  background: rgba(68,152,255,1);
+}
+
 </style>
 </head>
 <body>
-  <script>
+<script>
 
-var margin = {top: 20, right: 20, bottom: 30, left: 40},
+var body = document.querySelector("body");
+var container = document.createElement("div");
+container.id="container";
+body.appendChild(container);
+
+
+var leftdiv = document.createElement("div");
+leftdiv.id="leftdiv";
+container.appendChild(leftdiv);
+
+var rightdiv = document.createElement("div");
+rightdiv.id="rightdiv";
+container.appendChild(rightdiv);
+
+var ul = document.createElement("ul");
+rightdiv.appendChild(ul);
+
+
+var margin = {top: 20, right: 20, bottom: 30, left: 55},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
@@ -47,17 +133,34 @@ var yAxis = d3.svg.axis()
     .scale(y)
     .orient("left");
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#leftdiv").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("./public/bivariate.json", function(error, data) {
-  data.forEach(function(d) {
+var cntyselect_div = d3.select('body').append('div').attr('class','county_comp');
+var cntyselect_text = d3.select('.county_comp').append('h2').attr('class','cntyselect_text')
+.style('font-size','11px')
+.style('font-weight','normal')
+.style('color','black');
+
+
+queue()
+.defer(d3.json, "./public/us_counties_fips.json")
+.defer(d3.json, "./public/bivariate.json")
+.defer(d3.json, "./public/states_regions.json")
+.await(ready);
+
+function ready(error,map,data,region)
+{
+  console.log(region);
+  data.forEach(function(d)
+  {
     d.rate_educat = +d.rate_educat;
     d.incom = +d.incom;
   });
+
 
   x.domain(d3.extent(data, function(d) { return d.incom; })).nice();
   y.domain(d3.extent(data, function(d) { return d.rate_educat; })).nice();
@@ -88,10 +191,32 @@ d3.json("./public/bivariate.json", function(error, data) {
       .data(data)
     .enter().append("circle")
       .attr("class", "dot")
-      .attr("r", 2.5)
+      .attr("r", 3.5)
       .attr("cx", function(d) { return x(d.incom); })
       .attr("cy", function(d) { return y(d.rate_educat); })
-      .style("fill", "steelblue");
+      .attr("class", function(d)
+      {
+        for(i=0;i<region.length;i++)
+        {
+          if(d.id.substring(0,2)===region[i].id)
+          {return "dot "+region[i].region+" not_selected "+region[i].state.replace(" ","_")};
+        }
+      })
+      .style("opacity", 0.9)
+      .on('mouseover',function(d)
+      {
+        var filter = _.filter(map.objects.counties.geometries, function(o){return o.id===d.id});
+
+        console.log(region);
+        var state = _.filter(region,function(o){if(d.id.substring(0,2)===o.id) return o.state});
+        console.log(state);
+
+
+        cntyselect_text.html(filter[0].properties.name+"<br></br>"+state[0].state+"<br></br>$"+d.incom+"<br></br>"+d.rate_educat+"%")
+          .style('padding','5px 5px 5px 5px')
+          .attr("class","first_dataset");
+      })
+
 
   var legend = svg.selectAll(".legend")
       .data(color.domain())
@@ -112,7 +237,79 @@ d3.json("./public/bivariate.json", function(error, data) {
       .style("text-anchor", "end")
       .text(function(d) { return d; });
 
-});
+
+  var li = d3.select("ul")
+          .data(region)
+          .enter().append("li")
+          .text(function(d){return d.state})
+          .attr("class", function(d){return "state_"+ d.state.replace(" ","_")})
+          .on('mouseover',function(d)
+          {
+            var state_dots = d3.selectAll("."+d.state.replace(" ","_"));
+
+            var class0 = state_dots[0][0].classList[0];
+            var class1 = state_dots[0][0].classList[1];
+            var class2 = state_dots[0][0].classList[2];
+            var class3 = state_dots[0][0].classList[3];
+
+            state_dots
+            .attr("class",class0+" "+class1+" selected "+class3)
+            .style("opacity",1)
+
+
+            var not_selected = d3.selectAll(".not_selected");
+
+            // .transition()
+            // .duration(4000)
+
+            for(i=0;i<not_selected[0].length;i++)
+            {not_selected[0][i].setAttribute("class",not_selected[0][i].classList[0]+" "+not_selected[0][i].classList[1]+" "+not_selected[0][i].classList[2]+" "+not_selected[0][i].classList[3]+" mouseover")};
+            not_selected
+            .style("opacity",.2)
+          })
+          .on('mouseout',function(d)
+          {
+            var selected = d3.selectAll(".selected");
+
+            var class0 = selected[0][0].classList[0];
+            var class1 = selected[0][0].classList[1];
+            var class2 = selected[0][0].classList[2];
+            var class3 = selected[0][0].classList[3];
+
+            selected
+            .attr("class",class0+" "+class1+" not_selected "+class3)
+
+            var dots = d3.selectAll(".not_selected")
+
+            for(i=0;i<dots[0].length;i++)
+            {
+              dots[0][i].setAttribute("class",dots[0][i].classList[0]+" "+dots[0][i].classList[1]+" "+dots[0][i].classList[2]+" "+dots[0][i].classList[3]);
+            };
+
+            dots
+            .style("opacity",1);
+          })
+          .on('click',function(d)
+          {
+            var state_dots = d3.selectAll("."+d.state.replace(" ","_"));
+
+            var class0 = state_dots[0][0].classList[0];
+            var class1 = state_dots[0][0].classList[1];
+            var class2 = state_dots[0][0].classList[2];
+            var class3 = state_dots[0][0].classList[3];
+
+            state_dots
+            .attr("class",class0+" "+class1+" selected "+class3)
+            .style("opacity",1)
+
+            var not_selected = d3.selectAll(".not_selected")
+            .transition()
+            .duration(4000)
+            .style("opacity",0)
+
+
+          })
+};
 
 
 
