@@ -299,7 +299,7 @@ div .not_selected2 {
 
 
   var xhr1 = new XMLHttpRequest();
-  xhr1.open("GET","http://gabriel.princesspeach.nyc:4000/variables");
+  xhr1.open("GET","http://localhost:4000/variables");
 
   xhr1.addEventListener("load",function(e)
     {
@@ -389,6 +389,30 @@ div .not_selected2 {
                     ul.appendChild(li_4);
                     li_4.innerText = sub_detail.indicator3;
 
+
+                    // li_4.addEventListener("click", function()
+                    // {
+                    //   var select_li_4 = document.querySelector("."+sub_detail.c_id);
+                    //           if(select_li_4)
+                    //           {
+                    //             li_4.setAttribute("class","li_indic4 "+sub_detail.c_id+" selected4");
+                    //             var not_select_li_4 = document.querySelectorAll(".li_indic4");
+                    //             createPage(sub_detail);
+                    //
+                    //             for(i=0;i<not_select_li_4.length;i++)
+                    //             {
+                    //               if(not_select_li_4[i].className!==li_4.className)
+                    //               {
+                    //                 not_select_li_4[i].className="li_indic4 "+not_select_li_4[i].classList[1]+" not_select_li_4";
+                    //               };
+                    //             };
+                    //           };
+                    // });
+
+
+                    //example that requests only based on clicked li
+
+
                     li_4.onclick = function()
                     {
                             var select_li_4 = document.querySelector("."+sub_detail.c_id);
@@ -407,6 +431,9 @@ div .not_selected2 {
                               };
                             };
                     };
+
+                    ////////
+
                 });
                 li3.setAttribute("class","li_indic3");
               });
@@ -431,7 +458,7 @@ div .not_selected2 {
   var createPage = function(param)
     {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET","http://gabriel.princesspeach.nyc:4000/"+param.c_id);
+    xhr.open("GET","http://localhost:4000/"+param.c_id);
     xhr.send();
     xhr.addEventListener("load",function(e)
       {
@@ -450,6 +477,7 @@ div .not_selected2 {
 
       var path = d3.geo.path()
       .projection(projection);
+
 
       var tooltip = d3.select('#rightdiv').append('div')
       .style('position', 'absolute')
@@ -476,6 +504,10 @@ div .not_selected2 {
       .style('color','black');
 
       var higher = d3.select('rightdiv').append('div').attr('class','')
+
+      var color = d3.scale.ordinal()
+      .range(["#004F44","#009B7C","#3CBB90","#B9DEBD","#d5edea","#FBAF4D","#FF8E88","#FF473D","#FF180E","#BF0A00"]);
+
 
 
       queue()
@@ -505,7 +537,8 @@ div .not_selected2 {
           var test = rateById.get(d.id);
           var paths = d3.select('path')
           var pathclick = d3.selectAll('path');
-          pathclick.attr("class",function(d){ if (rateById.get(d.id) >= test){ return quantize(rateById.get(d.id))}})
+          pathclick.attr("class",function(d){ if (rateById.get(d.id) >= test){ return quantize(rateById.get(d.id))}});
+
           })
         .on('mouseover', function(d)
           {
@@ -538,6 +571,7 @@ div .not_selected2 {
           .on('click', function(d,evt)
           {
             var test = rateById.get(d.id);
+            
             d3.selectAll('path')
             .attr("class",function(d){ if (rateById.get(d.id) <= test){ return quantize(rateById.get(d.id))}});
 
@@ -558,10 +592,35 @@ div .not_selected2 {
         .attr("dy",".35em")
         .style("text-anchor", function(d){ return d.geometry.coordinates[0] > -1? "start": "end";})
         .text(function(d) { return d.properties.name;})
+        .attr("class", function(d){ return d.properties.name.replace(/\s/g,"_")+" place-level"})
+
+
+
+        d3.selectAll(".New_York")
+        .on('click', function(evt)
+        {
+          var metropolitan_div = d3.select('#rightdiv').append('div').attr('class','metropolitan_div')
+          .style("background-color","#F0F4F4")
+          .style("position", "absolute")
+          .style("right","20px")
+          .style("bottom","0px");
+
+          metropolitan_div.append('a')
+          .attr('href','http://localhost:4000/zip')
+          .html("Click here to view this variable by zipcode")
+          .style("font-family","Calibri")
+          .style("color","black")
+          .style("font-size", "12px")
+
+        });
+
 
         };
         d3.selectAll(".first_dataset")
         .style('display','none');
+
+
+
 
       });
 
