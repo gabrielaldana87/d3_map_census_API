@@ -248,6 +248,8 @@ div .not_selected2 {
 
 .no-js ul
 
+
+
 /*.not_selected2:hover{
   display: none;
 }*/
@@ -508,8 +510,6 @@ div .not_selected2 {
       var color = d3.scale.ordinal()
       .range(["#004F44","#009B7C","#3CBB90","#B9DEBD","#d5edea","#FBAF4D","#FF8E88","#FF473D","#FF180E","#BF0A00"]);
 
-
-
       queue()
       .defer(d3.json,"./us_counties_fips.json")
       .defer(d3.json,param.c_id+".json")
@@ -530,15 +530,35 @@ div .not_selected2 {
         .attr("d",path)
         .on('click', function(d)
           {
-          cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates <strong class="higher">higher</strong> than '+d.properties.name+' County:')
+          cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates <strong class="higher">HIGHER</strong> than '+d.properties.name+' County:')
           .style('padding','5px 5px 5px 5px')
-          .attr("class","first_dataset");
+          .attr("class","first_dataset")
+          .on('click',function(d)
+          {
+            if(l_switch===false)
+            {
+              d3.selectAll('path')
+              .attr("class",function(d){ if(rateById.get(d.id) <= compare){return quantize(rateById.get(d.id))}});
+              d3.select('strong.higher')[0][0].innerText="LOWER";
+              d3.select('strong.higher').style("color","#009B7C");
+              l_switch = true;
+            }
+            else
+            {
+              d3.selectAll('path')
+              .attr("class", function(d){ if (rateById.get(d.id) >= compare){ return quantize(rateById.get(d.id))}});
+              d3.select('strong.higher')[0][0].innerText="HIGHER";
+              d3.select('strong.higher').style("color","red");
+              l_switch = false;
+            }
+          });
 
-          var test = rateById.get(d.id);
+          d3.select('strong.higher').style("color","red");
+          var compare = rateById.get(d.id);
+          var l_switch = false;
           var paths = d3.select('path')
           var pathclick = d3.selectAll('path');
-          pathclick.attr("class",function(d){ if (rateById.get(d.id) >= test){ return quantize(rateById.get(d.id))}});
-
+          pathclick.attr("class",function(d){ if (rateById.get(d.id) >= compare){ return quantize(rateById.get(d.id))}});
           })
         .on('mouseover', function(d)
           {
@@ -563,25 +583,8 @@ div .not_selected2 {
           header3.html(param.indicator2);
           header4.html(param.indicator3);
 
-
           d3.selectAll('.title_header')
           .attr("class", 'first_dataset');
-
-          d3.select('.higher')
-          .on('click', function(d,evt)
-          {
-            var test = rateById.get(d.id);
-            
-            d3.selectAll('path')
-            .attr("class",function(d){ if (rateById.get(d.id) <= test){ return quantize(rateById.get(d.id))}});
-
-
-            cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates lower than '+d.properties.name+' County:')
-            .style('padding','5px 5px 5px 5px')
-            .attr("class","first_dataset")
-
-          });
-
 
         svg.selectAll(".place-label")
         .data(topojson.feature(usa,usa.objects.places_usa).features)
