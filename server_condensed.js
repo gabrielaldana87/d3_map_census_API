@@ -160,42 +160,42 @@ app.get('/:indicator',function(req, res)
             res.json(row);
             });
 
-    var url2 = "http://api.census.gov/data/2013/acs5/profile?get="+req.params.indicator+"&for=zip+code+tabulation+area:*"+key;
-
-    request(url2, function(error, response, body)
-    {
-      if(!error && response.statusCode === 200)
-        {
-          var data = JSON.parse(body);
-
-          data.forEach(function(zip)
-          {
-            var datum =
-            {
-              id: zip[1],
-              rate: parseFloat(zip[0])
-            }
-            array2.push(datum);
-          });
-
-          fs.writeFile("./public/zip_rate.json",JSON.stringify(array2),function(e)
-          {
-            console.log("Zip Code Rate done!");
-          })
-
-          var lowest = Number.POSITIVE_INFINITY;
-          var highest = Number.NEGATIVE_INFINITY;
-          var tmp;
-
-          for(var i=array2.length-1;i>=1;i--)
-            {
-              tmp = array2[i].rate;
-              if(tmp < lowest) lowest=tmp;
-              if(tmp > highest) highest =tmp;
-            }
-            console.log("highest: "+highest,"lowest: "+lowest);
-          }
-      });
+    // var url2 = "http://api.census.gov/data/2013/acs5/profile?get="+req.params.indicator+"&for=zip+code+tabulation+area:*"+key;
+    //
+    // request(url2, function(error, response, body)
+    // {
+    //   if(!error && response.statusCode === 200)
+    //     {
+    //       var data = JSON.parse(body);
+    //
+    //       data.forEach(function(zip)
+    //       {
+    //         var datum =
+    //         {
+    //           id: zip[1],
+    //           rate: parseFloat(zip[0])
+    //         }
+    //         array2.push(datum);
+    //       });
+    //
+    //       fs.writeFile("./public/zip_rate.json",JSON.stringify(array2),function(e)
+    //       {
+    //         console.log("Zip Code Rate done!");
+    //       })
+    //
+    //       var lowest = Number.POSITIVE_INFINITY;
+    //       var highest = Number.NEGATIVE_INFINITY;
+    //       var tmp;
+    //
+    //       for(var i=array2.length-1;i>=1;i--)
+    //         {
+    //           tmp = array2[i].rate;
+    //           if(tmp < lowest) lowest=tmp;
+    //           if(tmp > highest) highest =tmp;
+    //         }
+    //         console.log("highest: "+highest,"lowest: "+lowest);
+    //       }
+    //   });
     };
 });
 
