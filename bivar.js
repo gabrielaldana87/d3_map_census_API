@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-fs.readFile("./public/DP04_0088E.json", function(e1,data1)
+fs.readFile("./public/DP02_0067PE.json", function(e1,data1)
 {
   var bach_educat = JSON.parse(data1);
   var array = [];

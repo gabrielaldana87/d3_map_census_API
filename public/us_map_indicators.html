@@ -250,6 +250,7 @@ div .not_selected2 {
 
 
 
+
 /*.not_selected2:hover{
   display: none;
 }*/
@@ -301,7 +302,7 @@ div .not_selected2 {
 
 
   var xhr1 = new XMLHttpRequest();
-  xhr1.open("GET","http://localhost:4000/variables");
+  xhr1.open("GET","http://localhost:3000/variables");
 
   xhr1.addEventListener("load",function(e)
     {
@@ -391,30 +392,6 @@ div .not_selected2 {
                     ul.appendChild(li_4);
                     li_4.innerText = sub_detail.indicator3;
 
-
-                    // li_4.addEventListener("click", function()
-                    // {
-                    //   var select_li_4 = document.querySelector("."+sub_detail.c_id);
-                    //           if(select_li_4)
-                    //           {
-                    //             li_4.setAttribute("class","li_indic4 "+sub_detail.c_id+" selected4");
-                    //             var not_select_li_4 = document.querySelectorAll(".li_indic4");
-                    //             createPage(sub_detail);
-                    //
-                    //             for(i=0;i<not_select_li_4.length;i++)
-                    //             {
-                    //               if(not_select_li_4[i].className!==li_4.className)
-                    //               {
-                    //                 not_select_li_4[i].className="li_indic4 "+not_select_li_4[i].classList[1]+" not_select_li_4";
-                    //               };
-                    //             };
-                    //           };
-                    // });
-
-
-                    //example that requests only based on clicked li
-
-
                     li_4.onclick = function()
                     {
                             var select_li_4 = document.querySelector("."+sub_detail.c_id);
@@ -433,9 +410,6 @@ div .not_selected2 {
                               };
                             };
                     };
-
-                    ////////
-
                 });
                 li3.setAttribute("class","li_indic3");
               });
@@ -446,7 +420,7 @@ div .not_selected2 {
       });
 
     });
-  // createPage(array);
+
   xhr1.send();
 
   var width=960;
@@ -460,7 +434,7 @@ div .not_selected2 {
   var createPage = function(param)
     {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET","http://localhost:4000/"+param.c_id);
+    xhr.open("GET","http://localhost:3000/"+param.c_id);
     xhr.send();
     xhr.addEventListener("load",function(e)
       {
@@ -479,7 +453,6 @@ div .not_selected2 {
 
       var path = d3.geo.path()
       .projection(projection);
-
 
       var tooltip = d3.select('#rightdiv').append('div')
       .style('position', 'absolute')
@@ -505,10 +478,20 @@ div .not_selected2 {
       .style('font-weight','normal')
       .style('color','black');
 
+      var keys = d3.select('#leftdiv').append('div').attr('class','keys')
+
       var higher = d3.select('rightdiv').append('div').attr('class','')
 
-      var color = d3.scale.ordinal()
-      .range(["#004F44","#009B7C","#3CBB90","#B9DEBD","#d5edea","#FBAF4D","#FF8E88","#FF473D","#FF180E","#BF0A00"]);
+      var colors = ["#004F44","#009B7C","#3CBB90","#B9DEBD","#d5edea","#FBAF4D","#FF8E88","#FF473D","#FF180E","#BF0A00"];
+
+      var value = d3.scale.ordinal()
+      .domain(colors)
+      .rangeBands([domain.county_min,domain.county_max])
+
+
+      var legend = d3.select('#legend')
+                  .append('ul')
+                  .attr('class','list-inline')
 
       queue()
       .defer(d3.json,"./us_counties_fips.json")
@@ -530,17 +513,19 @@ div .not_selected2 {
         .attr("d",path)
         .on('click', function(d)
           {
-          cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates <strong class="higher">HIGHER</strong> than '+d.properties.name+' County:')
+          cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates <strong class="higher" color="red">HIGHER</strong> than '+d.properties.name+' County:')
           .style('padding','5px 5px 5px 5px')
           .attr("class","first_dataset")
           .on('click',function(d)
           {
+
+
             if(l_switch===false)
             {
               d3.selectAll('path')
               .attr("class",function(d){ if(rateById.get(d.id) <= compare){return quantize(rateById.get(d.id))}});
               d3.select('strong.higher')[0][0].innerText="LOWER";
-              d3.select('strong.higher').style("color","#009B7C");
+              d3.select('strong.higher').style("color","#009B7C")
               l_switch = true;
             }
             else
@@ -548,11 +533,11 @@ div .not_selected2 {
               d3.selectAll('path')
               .attr("class", function(d){ if (rateById.get(d.id) >= compare){ return quantize(rateById.get(d.id))}});
               d3.select('strong.higher')[0][0].innerText="HIGHER";
-              d3.select('strong.higher').style("color","red");
+              d3.select('strong.higher').style("color","red")
+
               l_switch = false;
             }
           });
-
           d3.select('strong.higher').style("color","red");
           var compare = rateById.get(d.id);
           var l_switch = false;
@@ -597,7 +582,25 @@ div .not_selected2 {
         .text(function(d) { return d.properties.name;})
         .attr("class", function(d){ return d.properties.name.replace(/\s/g,"_")+" place-level"})
 
+        var color_key = d3.select(".keys")
 
+        var rect = svg.selectAll('rect')
+        .data(colors)
+        .enter()
+        .append('rect')
+        .attr('y',function(d,i){return 400 + i*15 + "px"})
+        .attr('x','875px')
+        .attr('fill', function(d){return d})
+        .attr('width','15px')
+        .attr('height','15px')
+
+        svg.selectAll(".text_keys")
+        .data(colors)
+        .enter().append('text')
+        .attr('y',function(d,i){return 407 + (i*15) +'px'})
+        .attr('x','890px')
+        .text(function(d){ return parseFloat(value(d)).toFixed(1); })
+        .attr('class', 'first_dataset')
 
         d3.selectAll(".New_York")
         .on('click', function(evt)
@@ -609,7 +612,7 @@ div .not_selected2 {
           .style("bottom","0px");
 
           metropolitan_div.append('a')
-          .attr('href','http://localhost:4000/zip')
+          .attr('href','http://localhost:3000/zip')
           .html("Click here to view this variable by zipcode")
           .style("font-family","Calibri")
           .style("color","black")
@@ -617,13 +620,10 @@ div .not_selected2 {
 
         });
 
-
         };
+        d3.select('strong.higher').attr('class','first_dataset');
         d3.selectAll(".first_dataset")
         .style('display','none');
-
-
-
 
       });
 

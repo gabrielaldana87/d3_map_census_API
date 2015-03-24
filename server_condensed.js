@@ -51,7 +51,85 @@ app.get('/CREATE/:indicator',function(req, res)
     {
       var read = JSON.parse(data);
 
-for(i=0;i<read.length;i++)
+      var written = function()
+      {
+        console.log("this variable is already written");
+      };
+
+      var request_var = function(read)
+      {
+        request(url3, function(error, response, body)
+        {
+          if(!error && response.statusCode === 200)
+            {
+              var data = JSON.parse(body);
+              console.log(data.name);
+              var obj =
+              {
+                id: data.name,
+                concept: data.concept,
+                label: data.label
+              };
+              read.push(obj);
+
+              fs.writeFile("./public/variables.json", JSON.stringify(read),function(e)
+              {
+                console.log("Variable added!");
+              });
+            }
+        });
+
+        request(url, function(error, response, body)
+          {
+          if(!error && response.statusCode === 200)
+            {
+            var data = JSON.parse(body);
+            data.forEach(function(fips)
+              {
+              var obj =
+                {
+                id: fips[1]+fips[2],
+                rate: parseFloat(fips[0])
+                };
+              array.push(obj);
+              });
+              fs.writeFile("./public/"+req.params.indicator+".json", JSON.stringify(array),function(e)
+              {
+                console.log("County variable written!");
+              });
+            }
+          });
+
+        request(url2, function(error, response, body)
+        {
+          if(!error && response.statusCode === 200)
+            {
+              var data = JSON.parse(body);
+
+              data.forEach(function(zip)
+              {
+
+                if(zip[1].substring(0,1)==='1')
+                {
+                  var datum =
+                  {
+                  id: zip[1],
+                  rate: parseFloat(zip[0])
+                  }
+                  array2.push(datum);
+                };
+              });
+
+              fs.writeFile("./public/zip_var/"+req.params.indicator+".json",JSON.stringify(array2),function(e)
+              {
+                console.log("Zip Code Rate done!");
+              });
+
+            }
+          });
+      };
+
+for(i=0;i<read.length;i++){
 
         {if(req.params.indicator===read[i].id)
         { return written()}
@@ -61,88 +139,9 @@ for(i=0;i<read.length;i++)
           return request_var(read);
         };
         };
-
-
+      };
 
     });
-
-    var request_var = function(read)
-    {
-      request(url3, function(error, response, body)
-      {
-        if(!error && response.statusCode === 200)
-          {
-            var data = JSON.parse(body);
-            console.log(data.name);
-            var obj =
-            {
-              id: data.name,
-              concept: data.concept,
-              label: data.label
-            };
-            read.push(obj);
-
-            fs.writeFile("./public/variables.json", JSON.stringify(read),function(e)
-            {
-              console.log("Variable added!");
-            });
-          }
-      });
-
-      request(url, function(error, response, body)
-        {
-        if(!error && response.statusCode === 200)
-          {
-          var data = JSON.parse(body);
-          data.forEach(function(fips)
-            {
-            var obj =
-              {
-              id: fips[1]+fips[2],
-              rate: parseFloat(fips[0])
-              };
-            array.push(obj);
-            });
-            fs.writeFile("./public/"+req.params.indicator+".json", JSON.stringify(array),function(e)
-            {
-              console.log("County variable written!");
-            });
-          }
-        });
-
-      request(url2, function(error, response, body)
-      {
-        if(!error && response.statusCode === 200)
-          {
-            var data = JSON.parse(body);
-
-            data.forEach(function(zip)
-            {
-
-              if(zip[1].substring(0,1)==='1')
-              {
-                var datum =
-                {
-                id: zip[1],
-                rate: parseFloat(zip[0])
-                }
-                array2.push(datum);
-              };
-            });
-
-            fs.writeFile("./public/zip_var/"+req.params.indicator+".json",JSON.stringify(array2),function(e)
-            {
-              console.log("Zip Code Rate done!");
-            });
-
-          }
-        });
-    };
-
-    var written = function()
-    {
-      console.log("this variable is already written");
-    }
 
     };
 });
@@ -201,7 +200,7 @@ app.get('/:indicator',function(req, res)
 
 
 });
-var server = app.listen(4000,function()
+var server = app.listen(3000,function()
 {
-  console.log("listening on port 4000")
+  console.log("listening on port 3000")
 });

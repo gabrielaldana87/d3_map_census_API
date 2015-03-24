@@ -79,7 +79,7 @@ text{
 
   var projection = d3.geo.mercator()
   .center([-73.6867, 40.94])
-  .scale(50000)
+  .scale(6000)
   .translate([(width) / 2, (height)/2]);
 
   var path = d3.geo.path()
@@ -117,7 +117,7 @@ text{
     .data(topojson.feature(us,us.objects.zips_new_york_v2).features)
     .enter().append("path")
     .attr("class", function(d){return quantize(rateById.get(d.id))})
-    
+
     .attr("d", path)
     .on('click',function(d)
     {

@@ -15,10 +15,11 @@ CREATE TABLE variables (
   updated_at  DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TRIGGER mapping BEFORE UPDATE ON variables BEGIN
-UPDATE variables SET updated_at=CURRENT_TIMESTAMP WHERE id=new.id;
-END;
+-- CREATE TRIGGER mapping BEFORE UPDATE ON variables BEGIN
+-- UPDATE variables SET updated_at=CURRENT_TIMESTAMP WHERE id=new.id;
+-- END;
 
+DROP TABLE IF EXISTS county_min_max;
 
 CREATE TABLE county_min_max (
   id                        INTEGER PRIMARY KEY,
@@ -30,6 +31,6 @@ CREATE TABLE county_min_max (
   FOREIGN KEY(county_c_id)  REFERENCES variables(c_id)
 );
 
-CREATE TRIGGER mapping BEFORE UPDATE ON county_min_max BEGIN
-UPDATE county_min_max SET updated_at=CURRENT_TIMESTAMP WHERE id=new.id;
+CREATE TRIGGER mapping BEFORE UPDATE ON variables BEGIN
+UPDATE variables SET updated_at=CURRENT_TIMESTAMP WHERE id=new.id;
 END;

@@ -61,55 +61,56 @@ fs.readFile("./public/variables.json",function(e,data)
   );
   console.log(data_var);
   });
-});
 
-db.all("SELECT c_id FROM variables", function(err, rows)
-{
-  if(err){throw err;}
-
-  rows.forEach(function(obj)
+  db.all("SELECT c_id FROM variables", function(err, rows)
   {
+    if(err){throw err;}
 
-    fs.readFile("./public/"+obj.c_id+".json",function(e,data)
+    rows.forEach(function(obj)
     {
-      var read_variable = JSON.parse(data);
 
-      var lowest = Number.POSITIVE_INFINITY;
-      var highest = Number.NEGATIVE_INFINITY;
+      fs.readFile("./public/"+obj.c_id+".json",function(e,data)
+      {
+        var read_variable = JSON.parse(data);
 
-      var tmp;
+        var lowest = Number.POSITIVE_INFINITY;
+        var highest = Number.NEGATIVE_INFINITY;
 
-      // for(var i=read_variable.length-1;i>=1;i--)
-      for(var i=1;i<read_variable.length;i++)
-        {
+        var tmp;
 
-          tmp = read_variable[i].rate;
-
-          if(tmp === null) lowest = 0;
-          if(tmp < lowest) lowest=tmp;
-          if(tmp > highest) highest = tmp;
-        };
-
-
-        var obj_num =
-        {
-        county_c_id:    obj.c_id,
-        county_min:     lowest,
-        county_max:     highest
-        }
-
-          db.run("INSERT INTO  county_min_max (county_c_id,county_min,county_max) VALUES (?,?,?)",
-          obj.c_id,
-          lowest,
-          highest,
-
-          function(err)
+        // for(var i=read_variable.length-1;i>=1;i--)
+        for(var i=1;i<read_variable.length;i++)
           {
-            if(err){
-              throw err;
-            }
+
+            tmp = read_variable[i].rate;
+
+            if(tmp === null) lowest = 0;
+            if(tmp < lowest) lowest=tmp;
+            if(tmp > highest) highest = tmp;
+          };
+
+
+          var obj_num =
+          {
+          county_c_id:    obj.c_id,
+          county_min:     lowest,
+          county_max:     highest
           }
-        );
+
+            db.run("INSERT INTO  county_min_max (county_c_id,county_min,county_max) VALUES (?,?,?)",
+            obj.c_id,
+            lowest,
+            highest,
+
+            function(err)
+            {
+              if(err){
+                throw err;
+              }
+            }
+          );
+      });
     });
   });
-})
+
+});

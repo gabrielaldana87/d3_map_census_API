@@ -1,0 +1,7 @@
+remote -a cross-immersive-staging -r heroku-staging
+
+git remote -v
+
+git branch
+
+git push heroku-staging master -u
