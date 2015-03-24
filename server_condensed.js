@@ -147,7 +147,7 @@ for(i=0;i<read.length;i++){
 });
 
 
-app.get('choropleths/:indicator',function(req, res)
+app.get('/choropleths/:indicator',function(req, res)
   {
   if(req.params.indicator!=='favicon.ico')
     {
