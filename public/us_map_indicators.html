@@ -302,7 +302,7 @@ div .not_selected2 {
 
 
   var xhr1 = new XMLHttpRequest();
-  xhr1.open("GET","http://localhost:3000/variables");
+  xhr1.open("GET","http://gabriel.princesspeach.nyc/choropleths/variables");
 
   xhr1.addEventListener("load",function(e)
     {
@@ -434,7 +434,7 @@ div .not_selected2 {
   var createPage = function(param)
     {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET","http://localhost:3000/"+param.c_id);
+    xhr.open("GET","http://gabriel.princesspeach.nyc/choropleths/"+param.c_id);
     xhr.send();
     xhr.addEventListener("load",function(e)
       {
@@ -612,7 +612,7 @@ div .not_selected2 {
           .style("bottom","0px");
 
           metropolitan_div.append('a')
-          .attr('href','http://localhost:3000/zip')
+          .attr('href','http://gabriel.princesspeach.nyc/choropleths/zip')
           .html("Click here to view this variable by zipcode")
           .style("font-family","Calibri")
           .style("color","black")
