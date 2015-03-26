@@ -31,6 +31,15 @@
   width: 248px;
 }
 
+.region_div{
+  position: absolute;
+  top: 20px;
+  left: 350px;
+  font-family: Calibri;
+  background-color: #F0F4F4;
+  width: 248px;
+}
+
 .WEST{
   fill: #F6AB36;
 }
@@ -84,10 +93,18 @@ li{
   background: rgba(68,152,255,.6);
   text-align: center;
   border-bottom: 1px solid white;
+  width:100px;
+  height: 20px;
+  float:left;
+
 }
 
 li:hover{
   background: rgba(68,152,255,1);
+}
+
+.Puerto_Rico{
+  display:none;
 }
 
 </style>
@@ -113,9 +130,9 @@ var ul = document.createElement("ul");
 rightdiv.appendChild(ul);
 
 
-var margin = {top: 20, right: 20, bottom: 30, left: 55},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+var margin = {top: 100, right: 100, bottom: 30, left: 55},
+    width = 1060 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
 
 var x = d3.scale.linear()
     .range([0, width]);
@@ -140,10 +157,12 @@ var svg = d3.select("#leftdiv").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var cntyselect_div = d3.select('body').append('div').attr('class','county_comp');
+var region_div = d3.select('body').append('div').attr('class','region_div');
 var cntyselect_text = d3.select('.county_comp').append('h2').attr('class','cntyselect_text')
 .style('font-size','11px')
 .style('font-weight','normal')
 .style('color','black');
+
 
 
 queue()
@@ -160,6 +179,12 @@ function ready(error,map,data,region)
     d.rate_educat = +d.rate_educat;
     d.incom = +d.incom;
   });
+
+  var colors = ['#F0F4F4','#663398','#F6AB36','#26A65B','#2474A9','#F72459'];
+
+  var reg_div = _.uniq(_.map(region,function(o){return o.region}));
+
+  console.log(colors);
 
 
   x.domain(d3.extent(data, function(d) { return d.incom; })).nice();
@@ -306,9 +331,33 @@ function ready(error,map,data,region)
             .transition()
             .duration(4000)
             .style("opacity",0)
-
-
           })
+          .style('background-color',function(d){return d.color})
+
+          var color_key = d3.select('.keys')
+
+          var rect = svg.selectAll('rect')
+          .data(colors)
+          .enter()
+          .append('rect')
+          .attr('y','-37px')
+          .attr('x',function(d,i){return 450 + i*80 + 'px'})
+          .attr('fill',function(d){return d})
+          .attr('width','15px')
+          .attr('height','15px')
+
+          svg.selectAll('.text_keys')
+          .data(reg_div)
+          .enter().append('text')
+          .attr('y','-40px')
+          .attr('x',function(d,i){return 450 + i*80 + 'px'})
+          .text(function(d){return d})
+
+
+
+
+          _.uniq(_.map(region,function(o){return o.color}))
+
 };
 
 
