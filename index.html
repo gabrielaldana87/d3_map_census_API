@@ -15,6 +15,10 @@
   font: 10px sans-serif;
 }
 
+html{
+  background-color:#F0F4F4;
+}
+
 .axis path,
 .axis line {
   fill: none;
@@ -80,22 +84,37 @@ svg{
 }
 
 #rightdiv{
-  float: left;
+overflow: scroll;
+background-color: #F0F4F4;
 }
 
 #leftdiv{
   float: left;
 }
 
-li{
-  font: 10px sans-serif;
-  list-style: none;
-  background: rgba(68,152,255,.6);
-  text-align: center;
-  border-bottom: 1px solid white;
+ul{
+  overflow: scroll;
+  height:30px;
+  margin-left:0px;
+  padding-left:0px;
   width:100px;
-  height: 20px;
+}
+
+li{
+  font: 12px sans-serif;
+  list-style: none;
+  /*background: rgba(68,152,255,.6);*/
+  text-align: center;
+  /*border: 1px solid #F0F4F4;*/
+  width:100px;
+  height: 25px;
   float:left;
+  /*color:white;*/
+  padding-top:10px;
+  margin-top: 0px;
+  margin-left: 0px;
+
+
 
 }
 
@@ -126,11 +145,12 @@ var rightdiv = document.createElement("div");
 rightdiv.id="rightdiv";
 container.appendChild(rightdiv);
 
-var ul = document.createElement("ul");
-rightdiv.appendChild(ul);
+// var ul = document.createElement("ul");
+// rightdiv.appendChild(ul);
 
+var ul = d3.select('#rightdiv').append('ul');
 
-var margin = {top: 100, right: 100, bottom: 30, left: 55},
+var margin = {top: 50, right: 100, bottom: 30, left: 55},
     width = 1060 - margin.left - margin.right,
     height = 600 - margin.top - margin.bottom;
 
@@ -173,7 +193,6 @@ queue()
 
 function ready(error,map,data,region)
 {
-  console.log(region);
   data.forEach(function(d)
   {
     d.rate_educat = +d.rate_educat;
@@ -183,9 +202,6 @@ function ready(error,map,data,region)
   var colors = ['#F0F4F4','#663398','#F6AB36','#26A65B','#2474A9','#F72459'];
 
   var reg_div = _.uniq(_.map(region,function(o){return o.region}));
-
-  console.log(colors);
-
 
   x.domain(d3.extent(data, function(d) { return d.incom; })).nice();
   y.domain(d3.extent(data, function(d) { return d.rate_educat; })).nice();
@@ -199,7 +215,7 @@ function ready(error,map,data,region)
       .attr("x", width)
       .attr("y", -6)
       .style("text-anchor", "end")
-      .text("Median Household Income - Dollars");
+      .text("% of individuals 25 years or older with Bachelors Degrees or Higher")
 
   svg.append("g")
       .attr("class", "y axis")
@@ -210,7 +226,8 @@ function ready(error,map,data,region)
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("% of individuals 25yo with Bachelors Degrees or Higher")
+      .text("Median Household Income - Dollars");
+
 
   svg.selectAll(".dot")
       .data(data)
@@ -232,14 +249,39 @@ function ready(error,map,data,region)
       {
         var filter = _.filter(map.objects.counties.geometries, function(o){return o.id===d.id});
 
-        console.log(region);
         var state = _.filter(region,function(o){if(d.id.substring(0,2)===o.id) return o.state});
         console.log(state);
-
+        console.log(d);
 
         cntyselect_text.html(filter[0].properties.name+"<br></br>"+state[0].state+"<br></br>$"+d.incom+"<br></br>"+d.rate_educat+"%")
           .style('padding','5px 5px 5px 5px')
           .attr("class","first_dataset");
+
+                      svg
+                          .append('line')
+                          .attr('class','crosshair')
+                          .attr('x1',0)
+                          .attr('x2',width)
+                          .attr('y1',y(d.rate_educat))
+                          .attr('y2',y(d.rate_educat))
+                          .attr('stroke-width',2.5)
+                          .attr('stroke','black')
+                          .attr('opacity',.2);
+                      svg
+                          .append('line')
+                          .attr('class','crosshair')
+                          .attr('x1',x(d.incom))
+                          .attr('x2',x(d.incom))
+                          .attr('y1',0)
+                          .attr('y2',height)
+                          .attr('stroke-width',2.5)
+                          .attr('stroke','black')
+                          .attr('opacity',.2);
+      })
+      .on('mouseout',function(d)
+      {
+        d3.selectAll('.crosshair')
+        .style('display','none')
       })
 
 
@@ -262,11 +304,13 @@ function ready(error,map,data,region)
       .style("text-anchor", "end")
       .text(function(d) { return d; });
 
-
-  var li = d3.select("ul")
+          ul.selectAll('.eliu')
           .data(region)
           .enter().append("li")
-          .text(function(d){return d.state})
+          .text(function(d){
+            if(d.state==='NAME')
+            {return 'Select State'}
+            else {return d.state.toUpperCase()}})
           .attr("class", function(d){return "state_"+ d.state.replace(" ","_")})
           .on('mouseover',function(d)
           {
@@ -282,7 +326,7 @@ function ready(error,map,data,region)
             .style("opacity",1)
 
 
-            var not_selected = d3.selectAll(".not_selected");
+            var not_selected = d3.selectAll(".not_selected")
 
             // .transition()
             // .duration(4000)
@@ -332,7 +376,8 @@ function ready(error,map,data,region)
             .duration(4000)
             .style("opacity",0)
           })
-          .style('background-color',function(d){return d.color})
+          .style('border-left',function(d){return '6px solid '+d.color})
+          .style('color',function(d){return d.color})
 
           var color_key = d3.select('.keys')
 
@@ -352,11 +397,56 @@ function ready(error,map,data,region)
           .attr('y','-40px')
           .attr('x',function(d,i){return 450 + i*80 + 'px'})
           .text(function(d){return d})
+          .attr('class',function(d){return d})
+          .on('mouseover',function(d)
+            {
+              var state_dots = d3.selectAll("."+d);
+
+              var class0 = state_dots[0][0].classList[0];
+              var class1 = state_dots[0][0].classList[1];
+              var class2 = state_dots[0][0].classList[2];
+              var class3 = state_dots[0][0].classList[3];
+
+              state_dots
+              .attr("class",class0+" "+class1+" selected "+class3)
+              .style("opacity",1)
+
+
+              var not_selected = d3.selectAll(".not_selected");
+
+              // .transition()
+              // .duration(4000)
+
+              for(i=0;i<not_selected[0].length;i++)
+              {not_selected[0][i].setAttribute("class",not_selected[0][i].classList[0]+" "+not_selected[0][i].classList[1]+" "+not_selected[0][i].classList[2]+" "+not_selected[0][i].classList[3]+" mouseover")};
+              not_selected
+              .style("opacity",.2)
+            })
+            .on('mouseout',function(d)
+            {
+              var selected = d3.selectAll(".selected");
+
+              var class0 = selected[0][0].classList[0];
+              var class1 = selected[0][0].classList[1];
+              var class2 = selected[0][0].classList[2];
+              var class3 = selected[0][0].classList[3];
+
+              selected
+              .attr("class",class0+" "+class1+" not_selected "+class3)
+
+              var dots = d3.selectAll(".not_selected")
+
+              for(i=0;i<dots[0].length;i++)
+              {
+                dots[0][i].setAttribute("class",dots[0][i].classList[0]+" "+dots[0][i].classList[1]+" "+dots[0][i].classList[2]+" "+dots[0][i].classList[3]);
+              };
+
+              dots
+              .style("opacity",1);
+            })
 
 
 
-
-          _.uniq(_.map(region,function(o){return o.color}))
 
 };
 
