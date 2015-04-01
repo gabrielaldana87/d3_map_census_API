@@ -438,13 +438,17 @@ div.bar {
           d3.selectAll(".first_dataset")
           .style('display','none');
 
-          var second_box = new Rectangle('second',8,32,180,200,navs1,navs2,navs3,15,10);
+          var second_box = new Rectangle('second',8,32,220,250,navs1,navs2,navs3,13,10,'steelblue');
           second_box.createRight();
           second_box.createLeft();
           second_box.createTop();
           second_box.createBottom();
           second_box.createBranchHorizLeft();
           second_box.createText();
+
+          var second_branch = new Rectangle('secondbranch',21,8,10,80,navs1,navs2,navs3,0,0,'steelblue');
+          second_branch.createRight();
+          second_branch.createTop();
 
           });
         });
@@ -463,28 +467,13 @@ div.bar {
   .attr("height",height);
 
 
-function Rectangle(name,num,not_square,cx,cy,a,b,c,branch_length,vert_length)
+function Rectangle(name,num,not_square,cx,cy,a,b,c,branch_length,vert_length,color)
 {
   this.name= name,
   this.num= num,
   this.not_square = not_square,
   this.cx= cx,
   this.cy= cy,
-  this.createLeft= function(){
-    var dots_array = [];
-    for(i=0;i<num;i++)
-    {
-      dots_array.push(i);
-    };
-    svg.selectAll('.'+name+'_left_side')
-        .data(dots_array)
-        .enter().append('circle')
-        .attr('class','left_side')
-        .attr('r',2.5)
-        .attr("cx", cx + 100*not_square/10)
-        .attr("cy", function(i){return cy + 100*i/10})
-        .attr('fill','steelblue')
-  },
   this.createRight= function(){
     var dots_array = [];
     for(i=0;i<num;i++)
@@ -496,9 +485,24 @@ function Rectangle(name,num,not_square,cx,cy,a,b,c,branch_length,vert_length)
         .enter().append('circle')
         .attr('class','right_side')
         .attr('r',2.5)
+        .attr("cx", cx + 100*not_square/10)
+        .attr("cy", function(i){return cy + 100*i/10})
+        .attr('fill',color)
+  },
+  this.createLeft= function(){
+    var dots_array = [];
+    for(i=0;i<num;i++)
+    {
+      dots_array.push(i);
+    };
+    svg.selectAll('.'+name+'_left_side')
+        .data(dots_array)
+        .enter().append('circle')
+        .attr('class','left_side')
+        .attr('r',2.5)
         .attr("cx", cx)
         .attr("cy", function(i){return cy + 100*i/10})
-        .attr('fill','steelblue')
+        .attr('fill',color)
   },
   this.createTop= function(){
     var dots_array = [];
@@ -511,9 +515,9 @@ function Rectangle(name,num,not_square,cx,cy,a,b,c,branch_length,vert_length)
         .enter().append('circle')
         .attr('class','top_side')
         .attr('r',2.5)
-        .attr("cx", function(i){return cx + 100*i/10})
+        .attr("cx", function(i){return cx + 100*i/10 })
         .attr("cy", cy)
-        .attr('fill','steelblue')
+        .attr('fill',color)
   },
   this.createBottom = function(){
     var dots_array = [];
@@ -528,7 +532,7 @@ function Rectangle(name,num,not_square,cx,cy,a,b,c,branch_length,vert_length)
         .attr('r',2.5)
         .attr("cx", function(i){return cx + 100*i/10})
         .attr("cy", cy + 100*num/10)
-        .attr('fill','steelblue')
+        .attr('fill',color)
   },
   this.createText = function(){
     var lines = [a,b,c];
@@ -542,7 +546,7 @@ function Rectangle(name,num,not_square,cx,cy,a,b,c,branch_length,vert_length)
             .attr("font-family", "Calibri")
             .attr('text-anchor','center-align')
             .style("font-size", "15px")
-            .attr("fill", "#2284B5");
+            .attr("fill", color);
     },
     this.branch_length = branch_length,
     this.createBranchHorizLeft = function(){
@@ -558,7 +562,7 @@ function Rectangle(name,num,not_square,cx,cy,a,b,c,branch_length,vert_length)
         .attr('r',2.5)
         .attr("cx", function(i){return cx - 100*i/10})
         .attr("cy", cy + 100*(num/2)/10)
-        .attr('fill','steelblue')
+        .attr('fill',color)
   },
   this.createBranchHorizRight = function(){
   var dots_array = [];
@@ -573,7 +577,7 @@ function Rectangle(name,num,not_square,cx,cy,a,b,c,branch_length,vert_length)
       .attr('r',2.5)
       .attr("cx", function(i){return cx +10*not_square + 100*i/10})
       .attr("cy", cy + 100*(num/2)/10)
-      .attr('fill','steelblue')
+      .attr('fill',color)
 },
 this.createBranchVertRight = function(){
 var dots_array = [];
@@ -588,7 +592,7 @@ svg.selectAll('.'+name+'_branch_vertright')
     .attr('r',2.5)
     .attr("cx", cx + 10*not_square + 100*branch_length/10)
     .attr("cy", function(i){return cy + 100*(num/2)/10 - 100*i/10})
-    .attr('fill','steelblue')
+    .attr('fill',color)
 }
 };
 
@@ -600,8 +604,21 @@ var navs1   = 'Once you have selected the category; click on';
 var navs2   = 'any of the listed indicators on the left-hand';
 var navs3   = 'side to view a map based on these indicators';
 
+var intro1  = 'Welcome to my choropleth webpage!';
+var intro2  = 'This webpage connects with the US Census API so you';
+var intro3  = 'can explore Census indicators through interactive maps.'
 
-var help_box = new Rectangle('first',8,28,220,250,string1,string2,string3,30,28);
+var help_shade = new Rectangle('shade',8,28,222,252,string1,string2,string3,30,28,'lightgrey');
+help_shade.createRight();
+help_shade.createLeft();
+help_shade.createTop();
+help_shade.createBottom();
+help_shade.createBranchHorizRight();
+help_shade.createBranchVertRight();
+
+
+
+var help_box = new Rectangle('first',8,28,220,250,string1,string2,string3,30,28,'steelblue');
 help_box.createRight();
 help_box.createLeft();
 help_box.createTop();
@@ -610,28 +627,11 @@ help_box.createText();
 help_box.createBranchHorizRight();
 help_box.createBranchVertRight();
 
-var right_hand = new Rectangle('right_hand',0,28,650,10,0,0,0);
-right_hand.createTop();
+var intro_page = new Rectangle('intro_page',0,0,170,150,'',intro2,intro3,0,0,'#1F3A93');
+intro_page.createText();
 
-
-
-
-
-
-
-
-var lines =['hello'];
-
-svg.selectAll('text')
-          .data(lines)
-          .enter()
-          .append('text')
-          .attr('x',200)
-          .attr('y',400)
-          .text( function (d) { return d; })
-          .attr("font-family", "sans-serif")
-          .attr("font-size", "20px")
-          .attr("fill", "red");
+var intro_splash = new Rectangle('intro_page',0,0,220,150,intro1,'','',0,0,'#1F3A93');
+intro_splash.createText();
 
 
   var createPage = function(param)
