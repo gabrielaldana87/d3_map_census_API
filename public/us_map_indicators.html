@@ -248,12 +248,29 @@ div .not_selected2 {
 
 .no-js ul
 
-
-
-
 /*.not_selected2:hover{
   display: none;
 }*/
+
+div.bar {
+    display: inline-block;
+    width: 20px;
+    height: 75px;   /* We'll override this later */
+    background-color: teal;
+}
+
+
+.state-boundary{
+  stroke: red 2px solid;
+}
+
+.text_box{
+  position: absolute;
+  left:200px;
+  width:200px;
+  height:100px;
+  background-color:red;
+}
 
 </style>
 <body>
@@ -302,7 +319,7 @@ div .not_selected2 {
 
 
   var xhr1 = new XMLHttpRequest();
-  xhr1.open("GET","http://gabriel.princesspeach.nyc/choropleths/variables");
+  xhr1.open("GET","/choropleths/variables");
 
   xhr1.addEventListener("load",function(e)
     {
@@ -414,6 +431,21 @@ div .not_selected2 {
                 li3.setAttribute("class","li_indic3");
               });
           });
+
+          d3.selectAll('text').attr('class','first_dataset');
+
+          d3.selectAll('circle').attr('class','first_dataset');
+          d3.selectAll(".first_dataset")
+          .style('display','none');
+
+          var second_box = new Rectangle('second',8,32,180,200,navs1,navs2,navs3,15,10);
+          second_box.createRight();
+          second_box.createLeft();
+          second_box.createTop();
+          second_box.createBottom();
+          second_box.createBranchHorizLeft();
+          second_box.createText();
+
           });
         });
 
@@ -431,10 +463,181 @@ div .not_selected2 {
   .attr("height",height);
 
 
+function Rectangle(name,num,not_square,cx,cy,a,b,c,branch_length,vert_length)
+{
+  this.name= name,
+  this.num= num,
+  this.not_square = not_square,
+  this.cx= cx,
+  this.cy= cy,
+  this.createLeft= function(){
+    var dots_array = [];
+    for(i=0;i<num;i++)
+    {
+      dots_array.push(i);
+    };
+    svg.selectAll('.'+name+'_left_side')
+        .data(dots_array)
+        .enter().append('circle')
+        .attr('class','left_side')
+        .attr('r',2.5)
+        .attr("cx", cx + 100*not_square/10)
+        .attr("cy", function(i){return cy + 100*i/10})
+        .attr('fill','steelblue')
+  },
+  this.createRight= function(){
+    var dots_array = [];
+    for(i=0;i<num;i++)
+    {
+      dots_array.push(i);
+    };
+    svg.selectAll('.'+name+'_right_side')
+        .data(dots_array)
+        .enter().append('circle')
+        .attr('class','right_side')
+        .attr('r',2.5)
+        .attr("cx", cx)
+        .attr("cy", function(i){return cy + 100*i/10})
+        .attr('fill','steelblue')
+  },
+  this.createTop= function(){
+    var dots_array = [];
+    for(i=0;i<not_square;i++)
+    {
+      dots_array.push(i);
+    };
+    svg.selectAll('.'+name+'_top_side')
+        .data(dots_array)
+        .enter().append('circle')
+        .attr('class','top_side')
+        .attr('r',2.5)
+        .attr("cx", function(i){return cx + 100*i/10})
+        .attr("cy", cy)
+        .attr('fill','steelblue')
+  },
+  this.createBottom = function(){
+    var dots_array = [];
+    for(i=0;i<=not_square;i++)
+    {
+      dots_array.push(i);
+    };
+    svg.selectAll('.'+name+'_bottom_side')
+        .data(dots_array)
+        .enter().append('circle')
+        .attr('class','bottom_side')
+        .attr('r',2.5)
+        .attr("cx", function(i){return cx + 100*i/10})
+        .attr("cy", cy + 100*num/10)
+        .attr('fill','steelblue')
+  },
+  this.createText = function(){
+    var lines = [a,b,c];
+    svg.selectAll('.'+name+'_text')
+            .data(lines)
+            .enter()
+            .append('text')
+            .attr('x',function(d,i) {return cx+20})
+            .attr('y',function(d,i) {return cy+20*(i+1.2)})
+            .text( function (d) { return d; })
+            .attr("font-family", "Calibri")
+            .attr('text-anchor','center-align')
+            .style("font-size", "15px")
+            .attr("fill", "#2284B5");
+    },
+    this.branch_length = branch_length,
+    this.createBranchHorizLeft = function(){
+    var dots_array = [];
+    for(i=0;i<=branch_length;i++)
+    {
+      dots_array.push(i);
+    };
+    svg.selectAll('.'+name+'_branch_horizleft')
+        .data(dots_array)
+        .enter().append('circle')
+        .attr('class','branch_horizleft')
+        .attr('r',2.5)
+        .attr("cx", function(i){return cx - 100*i/10})
+        .attr("cy", cy + 100*(num/2)/10)
+        .attr('fill','steelblue')
+  },
+  this.createBranchHorizRight = function(){
+  var dots_array = [];
+  for(i=0;i<=branch_length;i++)
+  {
+    dots_array.push(i);
+  };
+  svg.selectAll('.'+name+'_branch_horizright')
+      .data(dots_array)
+      .enter().append('circle')
+      .attr('class','branch_horizright')
+      .attr('r',2.5)
+      .attr("cx", function(i){return cx +10*not_square + 100*i/10})
+      .attr("cy", cy + 100*(num/2)/10)
+      .attr('fill','steelblue')
+},
+this.createBranchVertRight = function(){
+var dots_array = [];
+for(i=0;i<=vert_length;i++)
+{
+  dots_array.push(i);
+};
+svg.selectAll('.'+name+'_branch_vertright')
+    .data(dots_array)
+    .enter().append('circle')
+    .attr('class','branch_vertright')
+    .attr('r',2.5)
+    .attr("cx", cx + 10*not_square + 100*branch_length/10)
+    .attr("cy", function(i){return cy + 100*(num/2)/10 - 100*i/10})
+    .attr('fill','steelblue')
+}
+};
+
+var string1 = 'To begin exploring, please click on any';
+var string2 = 'of the variable groupings listed in the';
+var string3 = 'blue buttons in the top right corner.';
+
+var navs1   = 'Once you have selected the category; click on';
+var navs2   = 'any of the listed indicators on the left-hand';
+var navs3   = 'side to view a map based on these indicators';
+
+
+var help_box = new Rectangle('first',8,28,220,250,string1,string2,string3,30,28);
+help_box.createRight();
+help_box.createLeft();
+help_box.createTop();
+help_box.createBottom();
+help_box.createText();
+help_box.createBranchHorizRight();
+help_box.createBranchVertRight();
+
+var right_hand = new Rectangle('right_hand',0,28,650,10,0,0,0);
+right_hand.createTop();
+
+
+
+
+
+
+
+
+var lines =['hello'];
+
+svg.selectAll('text')
+          .data(lines)
+          .enter()
+          .append('text')
+          .attr('x',200)
+          .attr('y',400)
+          .text( function (d) { return d; })
+          .attr("font-family", "sans-serif")
+          .attr("font-size", "20px")
+          .attr("fill", "red");
+
+
   var createPage = function(param)
     {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET","http://gabriel.princesspeach.nyc/choropleths/"+param.c_id);
+    xhr.open("GET","/choropleths/"+param.c_id);
     xhr.send();
     xhr.addEventListener("load",function(e)
       {
@@ -500,6 +703,8 @@ div .not_selected2 {
 
       function ready(err,usa,json)
         {
+
+          console.log(usa);
         json.forEach(function(obj)
           {
           rateById.set(obj.id,+obj.rate);
@@ -518,8 +723,6 @@ div .not_selected2 {
           .attr("class","first_dataset")
           .on('click',function(d)
           {
-
-
             if(l_switch===false)
             {
               d3.selectAll('path')
@@ -612,12 +815,11 @@ div .not_selected2 {
           .style("bottom","0px");
 
           metropolitan_div.append('a')
-          .attr('href','http://gabriel.princesspeach.nyc/choropleths/zip')
+          .attr('href','/choropleths/zip')
           .html("Click here to view this variable by zipcode")
           .style("font-family","Calibri")
           .style("color","black")
           .style("font-size", "12px")
-
         });
 
         };
