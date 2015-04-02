@@ -259,11 +259,6 @@ div.bar {
     background-color: teal;
 }
 
-
-.state-boundary{
-  stroke: red 2px solid;
-}
-
 .text_box{
   position: absolute;
   left:200px;
@@ -272,11 +267,22 @@ div.bar {
   background-color:red;
 }
 
+text.choro_box_text{
+  font-style: italic;
+  font-size: 10px;
+}
+
+
+.mesh{
+  stroke: red 2px solid;
+}
+
 </style>
 <body>
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script src="./squares.js"></script>
   <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
   <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -374,8 +380,6 @@ div.bar {
         var filtered = _.uniq(_.map(drilldown, function(o){return o.indicator2;}));
         li2.appendChild(ul3);
 
-
-
         filtered.forEach(function(detail)
           {
             var li3 = document.createElement("li");
@@ -438,7 +442,7 @@ div.bar {
           d3.selectAll(".first_dataset")
           .style('display','none');
 
-          var second_box = new Rectangle('second',8,32,220,250,navs1,navs2,navs3,13,10,'steelblue');
+          var second_box = new Rectangle('second',8,32,220,250,navs1,13,10,'steelblue');
           second_box.createRight();
           second_box.createLeft();
           second_box.createTop();
@@ -446,7 +450,7 @@ div.bar {
           second_box.createBranchHorizLeft();
           second_box.createText();
 
-          var second_branch = new Rectangle('secondbranch',21,8,10,80,navs1,navs2,navs3,0,0,'steelblue');
+          var second_branch = new Rectangle('secondbranch',21,8,10,80,navs1,0,0,'steelblue');
           second_branch.createRight();
           second_branch.createTop();
 
@@ -466,159 +470,14 @@ div.bar {
   .attr("width",width)
   .attr("height",height);
 
-
-function Rectangle(name,num,not_square,cx,cy,a,b,c,branch_length,vert_length,color)
-{
-  this.name= name,
-  this.num= num,
-  this.not_square = not_square,
-  this.cx= cx,
-  this.cy= cy,
-  this.createRight= function(){
-    var dots_array = [];
-    for(i=0;i<num;i++)
-    {
-      dots_array.push(i);
-    };
-    svg.selectAll('.'+name+'_right_side')
-        .data(dots_array)
-        .enter().append('circle')
-        .attr('class','right_side')
-        .attr('r',2.5)
-        .attr("cx", cx + 100*not_square/10)
-        .attr("cy", function(i){return cy + 100*i/10})
-        .attr('fill',color)
-  },
-  this.createLeft= function(){
-    var dots_array = [];
-    for(i=0;i<num;i++)
-    {
-      dots_array.push(i);
-    };
-    svg.selectAll('.'+name+'_left_side')
-        .data(dots_array)
-        .enter().append('circle')
-        .attr('class','left_side')
-        .attr('r',2.5)
-        .attr("cx", cx)
-        .attr("cy", function(i){return cy + 100*i/10})
-        .attr('fill',color)
-  },
-  this.createTop= function(){
-    var dots_array = [];
-    for(i=0;i<not_square;i++)
-    {
-      dots_array.push(i);
-    };
-    svg.selectAll('.'+name+'_top_side')
-        .data(dots_array)
-        .enter().append('circle')
-        .attr('class','top_side')
-        .attr('r',2.5)
-        .attr("cx", function(i){return cx + 100*i/10 })
-        .attr("cy", cy)
-        .attr('fill',color)
-  },
-  this.createBottom = function(){
-    var dots_array = [];
-    for(i=0;i<=not_square;i++)
-    {
-      dots_array.push(i);
-    };
-    svg.selectAll('.'+name+'_bottom_side')
-        .data(dots_array)
-        .enter().append('circle')
-        .attr('class','bottom_side')
-        .attr('r',2.5)
-        .attr("cx", function(i){return cx + 100*i/10})
-        .attr("cy", cy + 100*num/10)
-        .attr('fill',color)
-  },
-  this.createText = function(){
-    var lines = [a,b,c];
-    svg.selectAll('.'+name+'_text')
-            .data(lines)
-            .enter()
-            .append('text')
-            .attr('x',function(d,i) {return cx+20})
-            .attr('y',function(d,i) {return cy+20*(i+1.2)})
-            .text( function (d) { return d; })
-            .attr("font-family", "Calibri")
-            .attr('text-anchor','center-align')
-            .style("font-size", "15px")
-            .attr("fill", color);
-    },
-    this.branch_length = branch_length,
-    this.createBranchHorizLeft = function(){
-    var dots_array = [];
-    for(i=0;i<=branch_length;i++)
-    {
-      dots_array.push(i);
-    };
-    svg.selectAll('.'+name+'_branch_horizleft')
-        .data(dots_array)
-        .enter().append('circle')
-        .attr('class','branch_horizleft')
-        .attr('r',2.5)
-        .attr("cx", function(i){return cx - 100*i/10})
-        .attr("cy", cy + 100*(num/2)/10)
-        .attr('fill',color)
-  },
-  this.createBranchHorizRight = function(){
-  var dots_array = [];
-  for(i=0;i<=branch_length;i++)
-  {
-    dots_array.push(i);
-  };
-  svg.selectAll('.'+name+'_branch_horizright')
-      .data(dots_array)
-      .enter().append('circle')
-      .attr('class','branch_horizright')
-      .attr('r',2.5)
-      .attr("cx", function(i){return cx +10*not_square + 100*i/10})
-      .attr("cy", cy + 100*(num/2)/10)
-      .attr('fill',color)
-},
-this.createBranchVertRight = function(){
-var dots_array = [];
-for(i=0;i<=vert_length;i++)
-{
-  dots_array.push(i);
-};
-svg.selectAll('.'+name+'_branch_vertright')
-    .data(dots_array)
-    .enter().append('circle')
-    .attr('class','branch_vertright')
-    .attr('r',2.5)
-    .attr("cx", cx + 10*not_square + 100*branch_length/10)
-    .attr("cy", function(i){return cy + 100*(num/2)/10 - 100*i/10})
-    .attr('fill',color)
-}
-};
-
-var string1 = 'To begin exploring, please click on any';
-var string2 = 'of the variable groupings listed in the';
-var string3 = 'blue buttons in the top right corner.';
-
-var navs1   = 'Once you have selected the category; click on';
-var navs2   = 'any of the listed indicators on the left-hand';
-var navs3   = 'side to view a map based on these indicators';
-
+var string1 = 'To begin exploring, please click on any ^ of the variable groupings listed in the ^ blue buttons in the top right corner.';
+var navs1   = 'Once you have selected the category; click on ^ any of the listed indicators on the left-hand ^ side to view a map based on these indicators.';
 var intro1  = 'Welcome to my choropleth webpage!';
-var intro2  = 'This webpage connects with the US Census API so you';
-var intro3  = 'can explore Census indicators through interactive maps.'
+var intro2  = 'This webpage connects with the US Census API so you ^ can explore Census indicators through interactive maps.';
+var choro_def = 'noun ^ A thematic map in which areas are shaded or ^ patterned in proportion to the measurement of ^ the statistical variable being displayed on the map ^such as population density or per-capita income.'
+var choro_text = 'chor·o·pleth ^ /ˈkɔːrəˌplɛθ/';
 
-var help_shade = new Rectangle('shade',8,28,222,252,string1,string2,string3,30,28,'lightgrey');
-help_shade.createRight();
-help_shade.createLeft();
-help_shade.createTop();
-help_shade.createBottom();
-help_shade.createBranchHorizRight();
-help_shade.createBranchVertRight();
-
-
-
-var help_box = new Rectangle('first',8,28,220,250,string1,string2,string3,30,28,'steelblue');
+var help_box = new Rectangle('first',8,28,270,250,string1,28,28,'steelblue');
 help_box.createRight();
 help_box.createLeft();
 help_box.createTop();
@@ -627,11 +486,23 @@ help_box.createText();
 help_box.createBranchHorizRight();
 help_box.createBranchVertRight();
 
-var intro_page = new Rectangle('intro_page',0,0,170,150,'',intro2,intro3,0,0,'#1F3A93');
+var intro_page = new Rectangle('intro_page',0,0,170,100,intro2,0,0,'grey');
 intro_page.createText();
 
-var intro_splash = new Rectangle('intro_page',0,0,220,150,intro1,'','',0,0,'#1F3A93');
+var intro_splash = new Rectangle('intro_splash',0,0,240,80,intro1,0,0,'grey');
 intro_splash.createText();
+
+var choro_box = new Rectangle('choro_box',10,29,0,430,choro_def,0,0,'grey');
+choro_box.createText();
+
+var chor_big = new Rectangle('chor_big',0,0,0,390,choro_text,0,0,'black');
+chor_big.createText();
+
+d3.select('.chor_big_text').style('font-family','serif').style('font-size','18px');
+
+d3.selectAll('.intro_page_text').style('font-size','20px');
+d3.selectAll('.intro_splash_text').style('font-size','20px');
+d3.selectAll('.choro_box_text').style('font-size','12.5px');
 
 
   var createPage = function(param)
@@ -653,6 +524,24 @@ intro_splash.createText();
       var projection = d3.geo.albersUsa()
       .scale(1280)
       .translate([width / 2, height / 2]);
+
+      function zoomed() {
+        var g = d3.selectAll('g');
+        g.style("stroke-width", 1.5 / d3.event.scale + "px");
+        g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
+        d3.selectAll("text")
+        // .style("stroke-width", 1.5 / d3.event.scale + "px");
+
+        // .attr("x", function(d){ return d.geometry.coordinates[0] > -1? 6: -6;})
+        d3.selectAll('.place-level').attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+      }
+
+      var zoom = d3.behavior.zoom()
+          .translate([0, 0])
+          .scale(1)
+          .scaleExtent([1, 8])
+          .on("zoom", zoomed);
 
       var path = d3.geo.path()
       .projection(projection);
@@ -694,21 +583,25 @@ intro_splash.createText();
 
       var legend = d3.select('#legend')
                   .append('ul')
-                  .attr('class','list-inline')
+                  .attr('class','list-inline');
+
+          svg
+                .call(zoom) // delete this line to disable free zooming
+                .call(zoom.event);
 
       queue()
-      .defer(d3.json,"./us_counties_fips.json")
+      .defer(d3.json,"./states.json")
       .defer(d3.json,param.c_id+".json")
       .await(ready);
 
       function ready(err,usa,json)
         {
-
           console.log(usa);
         json.forEach(function(obj)
           {
           rateById.set(obj.id,+obj.rate);
-          })
+          });
+
         svg.append("g")
         .attr("class","counties")
         .selectAll("path")
@@ -778,12 +671,15 @@ intro_splash.createText();
         .data(topojson.feature(usa,usa.objects.places_usa).features)
         .enter().append("text")
         .attr("class","place-level")
-        .attr("transform",function(d){ return "translate(" + projection(d.geometry.coordinates) + ")"; })
+        // .attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+        .attr("transform", function(d){ return "translate(" + projection(d.geometry.coordinates) + ")"})
+        // .attr("transform",function(d){ return "translate(" + projection(d.geometry.coordinates) + ")";})
         .attr("x", function(d){ return d.geometry.coordinates[0] > -1? 6: -6;})
         .attr("dy",".35em")
         .style("text-anchor", function(d){ return d.geometry.coordinates[0] > -1? "start": "end";})
         .text(function(d) { return d.properties.name;})
         .attr("class", function(d){ return d.properties.name.replace(/\s/g,"_")+" place-level"})
+
 
         var color_key = d3.select(".keys")
 
