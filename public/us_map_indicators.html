@@ -4,14 +4,14 @@
 </head>
 <style>
 path{
-  stroke-width:.1;
+  /*stroke-width:.2;*/
   stroke-linejoin:round;
-  stroke:black;
+  stroke:grey;
   fill:#f0f4f4;
 }
 path:hover{
-  stroke:red;
-  stroke-width:1;
+  /*stroke:red;*/
+  /*stroke-width:.2;*/
 }
 
 .place-label {
@@ -87,7 +87,7 @@ a{
 .q1-9 { fill:#009B7C; }
 .q2-9 { fill:#3CBB90; }
 .q3-9 { fill:#B9DEBD; }
-.q4-9 { fill:#d5edea; }
+.q4-9 { fill:#B1F2EA; }
 .q5-9 { fill:#FBAF4D; }
 .q6-9 { fill:#FF8E88; }
 .q7-9 { fill:#FF473D; }
@@ -273,9 +273,7 @@ text.choro_box_text{
 }
 
 
-.mesh{
-  stroke: red 2px solid;
-}
+
 
 </style>
 <body>
@@ -507,6 +505,12 @@ d3.selectAll('.choro_box_text').style('font-size','12.5px');
 
   var createPage = function(param)
     {
+
+      d3.selectAll('circle').attr('class','first_dataset');
+      d3.selectAll(".second_text").attr('class','first_dataset');
+      d3.selectAll(".first_dataset")
+      .style('display','none');
+
     var xhr = new XMLHttpRequest();
     xhr.open("GET","/choropleths/"+param.c_id);
     xhr.send();
@@ -529,11 +533,6 @@ d3.selectAll('.choro_box_text').style('font-size','12.5px');
         var g = d3.selectAll('g');
         g.style("stroke-width", 1.5 / d3.event.scale + "px");
         g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-
-        d3.selectAll("text")
-        // .style("stroke-width", 1.5 / d3.event.scale + "px");
-
-        // .attr("x", function(d){ return d.geometry.coordinates[0] > -1? 6: -6;})
         d3.selectAll('.place-level').attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
       }
 
@@ -574,7 +573,7 @@ d3.selectAll('.choro_box_text').style('font-size','12.5px');
 
       var higher = d3.select('rightdiv').append('div').attr('class','')
 
-      var colors = ["#004F44","#009B7C","#3CBB90","#B9DEBD","#d5edea","#FBAF4D","#FF8E88","#FF473D","#FF180E","#BF0A00"];
+      var colors = ["#004F44","#009B7C","#3CBB90","#B9DEBD","#B1F2EA","#FBAF4D","#FF8E88","#FF473D","#FF180E","#BF0A00"];
 
       var value = d3.scale.ordinal()
       .domain(colors)
@@ -603,12 +602,15 @@ d3.selectAll('.choro_box_text').style('font-size','12.5px');
           });
 
         svg.append("g")
+        .selectAll('path')
         .attr("class","counties")
-        .selectAll("path")
         .data(topojson.feature(usa,usa.objects.counties).features)
-        .enter().append("path")
+        .enter().append('path')
         .attr("class",function(d){return quantize(rateById.get(d.id))})
         .attr("d",path)
+        .style("stroke-width", ".5px")
+
+
         .on('click', function(d)
           {
           cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates <strong class="higher" color="red">HIGHER</strong> than '+d.properties.name+' County:')
@@ -671,9 +673,7 @@ d3.selectAll('.choro_box_text').style('font-size','12.5px');
         .data(topojson.feature(usa,usa.objects.places_usa).features)
         .enter().append("text")
         .attr("class","place-level")
-        // .attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         .attr("transform", function(d){ return "translate(" + projection(d.geometry.coordinates) + ")"})
-        // .attr("transform",function(d){ return "translate(" + projection(d.geometry.coordinates) + ")";})
         .attr("x", function(d){ return d.geometry.coordinates[0] > -1? 6: -6;})
         .attr("dy",".35em")
         .style("text-anchor", function(d){ return d.geometry.coordinates[0] > -1? "start": "end";})
