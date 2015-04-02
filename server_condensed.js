@@ -39,7 +39,7 @@ app.get('/choropleths/zip', function(req,res)
 });
 
 
-app.get('choropleths/CREATE/:indicator',function(req, res)
+app.get('/choropleths/CREATE/:indicator',function(req, res)
   {
   if(req.params.indicator!=='favicon.ico')
     {
