@@ -6,6 +6,7 @@ var sqlite3 = require("sqlite3").verbose();
 var cors = require('cors');
 
 var db = new sqlite3.Database("mapping.db");
+var db2 = new sqlite3.Database("./csv2sqlite/stop_frisk.db")
 
 var app = express();
 app.use(cors());
@@ -161,9 +162,91 @@ app.get('/choropleths/:indicator',function(req, res)
     };
 });
 
+app.get('/bivariate',function(req,res)
+{
+  res.sendFile(__dirname + '/public/bivar.html');
+});
+
+app.get('/stopandfrisk',function(req,res)
+{
+  res.sendFile(__dirname + '/public/stop_frisk.html');
+});
+
+app.get('/stopandfrisk/details',function(req,res)
+{
+  if(req.params.indicator!=='favicon.ico')
+    {
+          db2.all("SELECT ID, Longitude, Latitude, race FROM data",
+          function(err, row)
+            {
+            if(err) {throw err;}
+            res.json(row);
+            });
+    };
+});
+
+app.get('/stopandfrisk/details/:concept',function(req,res)
+{
+  if(req.params.concept!=='favicon.ico')
+    {
+      console.log(req.params.concept)
+          db2.all("SELECT ID FROM data WHERE "+req.params.concept+" ='Y'",
+          function(err, row)
+            {
+            if(err) {throw err;}
+            res.json(row);
+            });
+    };
+});
+
+app.get('/bivariate/:indicator1/:indicator2',function(req,res)
+{
+  if(req.params.indicator!=='favicon.ico')
+    {
+      fs.readFile("./public/"+req.params.indicator1+".json", function(e1,data1)
+      {
+        var bach_educat = JSON.parse(data1);
+        var array = [];
+
+        bach_educat.forEach(function(obj)
+        {
+          var single =
+          {
+            id: obj.id,
+            rate_one: obj.rate
+          }
+           array.push(single);
+        });
+
+        fs.readFile("./public/"+req.params.indicator2+".json", function(e2,data2)
+        {
+          var med_income = JSON.parse(data2);
+
+          med_income.forEach(function(obj2)
+          {
+            array.forEach(function(arr)
+            {
+              if(obj2.id===arr.id)
+              {
+              arr.rate_two = obj2.rate;
+              };
+            });
+          });
+          fs.writeFile("./public/bivariate.json", JSON.stringify(array),function(e)
+          {
+            console.log("you are on your way to bivariate analysis!");
+            res.json(array);
+          });
+        });
+
+      });
+
+    };
+});
+
 
 });
-var server = app.listen(80,function()
+var server = app.listen(3000,function()
 {
   console.log("listening on port 80")
 });

@@ -36,15 +36,15 @@ text{
 }
 
 
-.A { fill:#26A65B; }
-.B { fill:#3b539b; }
-.I { fill:#663398; }
+.A { fill: #F6AB36; }
+.B { fill: steelblue; }
+.I { fill: #663398; }
 .P { fill: seagreen; }
-.Q { fill:#F6AB36; }
-.W { fill:#F72459; }
+.Q { fill: #F72459; }
+.W { fill: #26A65B; }
 .X { fill: grey; }
 .U { fill: grey; }
-.Z { fill: brown ; }
+.Z { fill: purple ; }
 
 #tooltip{
   position: absolute;
@@ -60,8 +60,9 @@ text{
   font-family: "Calibri";
 }
 
-
-
+.N{
+  fill:black;
+}
 
 </style>
 <body>
@@ -72,9 +73,13 @@ text{
   <script>
 
   var body = document.querySelector('body')
-  var p = document.createElement('p')
-  body.appendChild(p)
-  p.innerText = "Contraband"
+  var input = document.createElement('input')
+  body.appendChild(input);
+  input.placeholder = "concept";
+
+  var button = document.createElement('button');
+  body.appendChild(button);
+  button.innerText='Submit';
 
   var width = 1300,
   height = 1200;
@@ -90,11 +95,23 @@ text{
   .scale(120000)
   .translate([(width) / 2, (height)/2]);
 
+
+  function zoomTo(d, scale) {
+  var point = d3.geo.mercator()
+  .translate([0,0])
+  .scale(120000)(d.Longitude,d.Latitude);
+  return zoom
+      .translate([width / 2 - point[0] * scale, height / 2 - point[1] * scale])
+      .scale(scale);
+};
+
+
   function zoomed() {
 
     var g = d3.selectAll('g');
     g.style("stroke-width", 1.5 / d3.event.scale + "px");
-    g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
+
   };
 
   var zoom = d3.behavior.zoom()
@@ -122,20 +139,15 @@ text{
 
   queue()
   .defer(d3.json, "./topo_nyc.json")
-  .defer(d3.csv, "./2014QGISOUT.csv")
+  // .defer(d3.csv, "./2014QGISOUT.csv")
   .await(ready);
 
   svg
               .call(zoom) // delete this line to disable free zooming
               .call(zoom.event);
 
-  function ready(error, us, json) {
-    console.log(us);
-    // console.log(json);
-    json.forEach(function(obj)
-    {
+  function ready(error, us) {
 
-    })
     svg.append("g")
     .attr("class", "zips")
     .selectAll("path")
@@ -168,64 +180,61 @@ text{
     })
     .attr("id","tooltip");
 
-    svg.selectAll('.dot')
-      .data(json)
-      .enter().append('circle')
-      .attr('class','dot')
-      .attr('r',2)
-      .style('opacity',1)
-      .attr('transform', function(d){
-        return 'translate('+ projection([
-          d.Longitude,
-          d.Latitude
-        ])+')'
-      })
-      .attr('class',function(d){return d.race+" "+d.contrabn})
-      .call(zoom.event)
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET","/stopandfrisk/details");
+    xhr.send();
+    xhr.addEventListener("load",function(e)
+    {
+      var d = xhr.responseText;
+      var json = JSON.parse(d);
+      // console.log(json);
+
+      svg.append('g')
+      .attr('class', 'zips')
+      .selectAll('.dot')
+        .data(json)
+        .enter().append('circle')
+        .attr('r',1.5)
+        .style('opacity',1)
+        .attr('transform', function(d){
+          return 'translate('+ projection([
+            d.Longitude,
+            d.Latitude
+          ])+')'
+        })
+        .attr('class',function(d){return 'zips '+ d.race})
+        .attr('id',function(d){return "C"+d.ID.toString()})
+
+          button.addEventListener('click',function(){
+
+            var xhr1 = new XMLHttpRequest();
+            xhr1.open("GET","/stopandfrisk/details/"+input.value);
+            xhr1.send();
+            xhr1.addEventListener("load",function(e)
+            {
+              var d = xhr1.responseText;
+              var concept = JSON.parse(d);
+
+              console.log(concept)
+              console.log(d3.selectAll('.zips'))
+
+              var test = d3.selectAll('circle')
+              .classed("N",true)
+              .style('opacity',.2)
+
+              for(i=0;i<concept.length;i++)
+              {
+                var picked = d3.select("#C"+concept[i].ID)
+                .classed({"N": false, "Y": true})
+                .style('opacity',1)
+              }
+
+             })
+            });
+
+    });
 
 
-      d3.select('p')
-       .on('mouseover',function(){
-        d3.selectAll(".N")
-        .transition()
-        .duration(1000)
-        .style('fill','black')
-        .style('opacity',.1)
-
-        var contraband = _.filter(json,function(o){return o.pistol==="Y"});
-
-        var black = _.filter(json, function(o){ return o.race==="B"}).length;
-        var white = _.filter(json, function(o){ return o.race==="W"}).length;
-        var bhisp = _.filter(json, function(o){ return o.race==="P"}).length;
-        var whisp = _.filter(json, function(o){ return o.race==="Q"}).length;
-
-        console.log(black/json.length);
-        console.log(white/json.length);
-        console.log(bhisp/json.length);
-        console.log(whisp/json.length);
-
-        svg.selectAll('.dot_contraband_yes')
-          .data(contraband)
-          .enter().append('circle')
-          .attr('class','dot')
-          .attr('r',1.5)
-          .attr('transform', function(d){
-            return 'translate('+ projection([
-              d.Longitude,
-              d.Latitude
-            ])+')'
-          })
-          .attr('class',function(d){return d.race})
-       })
-       .on('mouseout',function()
-       {
-
-
-       })
-      // var projection = d3.geo.mercator()
-      // .center([-74.0059, 40.7127])
-      // .scale(120000)
-      // .translate([(width) / 2, (height)/2]);
 
   };
   </script>
