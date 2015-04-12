@@ -36,6 +36,15 @@ text{
 }
 
 
+input{
+  position: absolute;
+  top: 40px;
+}
+
+button{
+  position: absolute;
+  top: 70px;
+}
 .A { fill: #F6AB36; }
 .B { fill: steelblue; }
 .I { fill: #663398; }
@@ -81,8 +90,8 @@ text{
   body.appendChild(button);
   button.innerText='Submit';
 
-  var width = 1300,
-  height = 1200;
+  var width = 1500,
+  height = 1600;
 
   var rateById = d3.map();
 
@@ -91,8 +100,8 @@ text{
   .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
   var projection = d3.geo.mercator()
-  .center([-74.0059, 40.7127])
-  .scale(120000)
+  .center([-73.9667, 40.7172])
+  .scale(160000)
   .translate([(width) / 2, (height)/2]);
 
 
@@ -105,9 +114,7 @@ text{
       .scale(scale);
 };
 
-
   function zoomed() {
-
     var g = d3.selectAll('g');
     g.style("stroke-width", 1.5 / d3.event.scale + "px");
     g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
@@ -139,7 +146,6 @@ text{
 
   queue()
   .defer(d3.json, "./topo_nyc.json")
-  // .defer(d3.csv, "./2014QGISOUT.csv")
   .await(ready);
 
   svg
@@ -187,14 +193,49 @@ text{
     {
       var d = xhr.responseText;
       var json = JSON.parse(d);
-      // console.log(json);
+      console.log(json);
+
+      var array =[];
+
+      json.forEach(function(o)
+      {
+        array.push(o.Longitude.toString().substring(0,7)+o.Latitude.toString().substring(0,7)+o.race);
+      });
+
+      function foo(arr) {
+        var a = [], b = [], prev;
+
+        arr.sort();
+        for ( var i = 0; i < arr.length; i++ )
+        {
+            if ( arr[i] !== prev )
+            {
+            a.push(arr[i]);
+            b.push(1);
+            } else
+
+            {
+            b[b.length-1]++;
+            }
+            prev = arr[i];
+        }
+
+    return [a, b];
+}
+
+var result = foo(array);
+console.log(result);
+
 
       svg.append('g')
       .attr('class', 'zips')
       .selectAll('.dot')
         .data(json)
         .enter().append('circle')
-        .attr('r',1.5)
+        .attr('r',1.8)
+        // .attr('r',function(d){
+        //   return 1+result[1][result[0].indexOf(d.Longitude.toString().substring(0,7)+d.Latitude.toString().substring(0,7)+d.race)]/4;
+        // })
         .style('opacity',1)
         .attr('transform', function(d){
           return 'translate('+ projection([
@@ -215,9 +256,6 @@ text{
               var d = xhr1.responseText;
               var concept = JSON.parse(d);
 
-              console.log(concept)
-              console.log(d3.selectAll('.zips'))
-
               var test = d3.selectAll('circle')
               .classed("N",true)
               .style('opacity',.2)
@@ -231,7 +269,6 @@ text{
 
              })
             });
-
     });
 
 
