@@ -91,7 +91,8 @@ button{
   button.innerText='Submit';
 
   var width = 1500,
-  height = 1600;
+      height = 1600,
+      radius = Math.min(width, height) / 2;
 
   var rateById = d3.map();
 
@@ -133,6 +134,12 @@ button{
   var svg = d3.select("body").append("svg")
   .attr("width", width)
   .attr("height", height);
+
+  var keys = d3.select('#leftdiv').append('div').attr('class','keys');
+
+
+  var colors = ["steelblue","#F72459","#3B539B","#26A65B","#F6AB36","#663398","grey","purple"];
+  var races  = ["Black","White-Hispanic","Black-Hispanic","White","Asian","American Indian/Alaskan Native","Unknown","Other"]
 
   var tooltip = d3.select('body').append('div')
   .style('position', 'absolute')
@@ -193,7 +200,7 @@ button{
     {
       var d = xhr.responseText;
       var json = JSON.parse(d);
-      console.log(json);
+      // console.log(json);
 
       var array =[];
 
@@ -226,7 +233,6 @@ button{
 var result = foo(array);
 console.log(result);
 
-
       svg.append('g')
       .attr('class', 'zips')
       .selectAll('.dot')
@@ -234,7 +240,7 @@ console.log(result);
         .enter().append('circle')
         .attr('r',1.8)
         // .attr('r',function(d){
-        //   return 1+result[1][result[0].indexOf(d.Longitude.toString().substring(0,7)+d.Latitude.toString().substring(0,7)+d.race)]/4;
+        //   return 1.8+result[1][result[0].indexOf(d.Longitude.toString().substring(0,7)+d.Latitude.toString().substring(0,7)+d.race)]/4;
         // })
         .style('opacity',1)
         .attr('transform', function(d){
@@ -269,9 +275,28 @@ console.log(result);
 
              })
             });
+
+
+            var color_key = d3.select(".keys")
+            var rect = svg.selectAll('rect')
+            .data(colors)
+            .enter()
+            .append('rect')
+            .attr('y',function(d,i){return 400 + i*15 + "px"})
+            .attr('x','100px')
+            .attr('fill', function(d){return d})
+            .attr('width','15px')
+            .attr('height','15px')
+
+            svg.selectAll(".text_keys")
+            .data(races)
+            .enter().append('text')
+            .attr('y',function(d,i){return 407 + (i*15) +'px'})
+            .attr('x','120px')
+            .text(function(d){ return d})
+            .attr('class', 'first_dataset')
+            .style('font-size','12px')
     });
-
-
 
   };
   </script>
