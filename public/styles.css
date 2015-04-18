@@ -1,0 +1,122 @@
+body {
+font: 10px sans-serif;
+}
+
+html{
+background-color:white;
+}
+
+.axis path,
+.axis line {
+fill: none;
+stroke: #000;
+shape-rendering: crispEdges;
+}
+
+.county_comp{
+position: absolute;
+top: 120px;
+left: 150px;
+font-family: Calibri;
+background-color: white;
+width: 248px;
+}
+
+.region_div{
+position: absolute;
+top: 20px;
+left: 350px;
+font-family: Calibri;
+background-color: #F0F4F4;
+width: 248px;
+}
+
+.WEST{
+fill: #F6AB36;
+}
+
+.SOUTHWEST{
+fill: #26A65B;
+}
+
+.NORTHEAST{
+fill: #2474A9;
+}
+
+.SOUTH{
+fill:#663398;
+}
+
+.MIDWEST{
+fill: #F72459;
+}
+
+
+h2{
+margin-top:0px;
+margin-bottom:0px;
+line-height:10px;
+}
+
+svg{
+background: white;
+}
+
+/*.mouseover{
+fill: grey;
+}*/
+
+#container{
+margin-left: 2%;
+}
+
+#rightdiv{
+overflow: scroll;
+background-color: white;
+margin-left: 2%;
+width: 240px;
+}
+
+#leftdiv{
+float: left;
+}
+
+ul{
+/*overflow: scroll;*/
+height:30px;
+margin-left:0px;
+padding-left:0px;
+/*width:100px;*/
+}
+
+li{
+font: 10px sans-serif;
+list-style: none;
+/*background: rgba(68,152,255,.6);*/
+text-align: center;
+/*border: 1px solid #F0F4F4;*/
+width:120px;
+height: 15px;
+float:left;
+/*color:white;*/
+/*padding-top:10px;*/
+margin-top: 5px;
+margin-left: 0px;
+
+}
+
+li:hover{
+background: rgba(68,152,255,1);
+}
+
+.Puerto_Rico{
+display:none;
+}
+
+.state_NAME{
+display:none;
+}
+
+.state_Puerto_Rico{
+display:none;
+}

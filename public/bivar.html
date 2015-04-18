@@ -28,7 +28,7 @@ html{
 
 .county_comp{
   position: absolute;
-  top: 20px;
+  top: 25px;
   left: 150px;
   font-family: Calibri;
   background-color: #F0F4F4;
@@ -128,6 +128,12 @@ li:hover{
   display:none;
 }
 
+.state_Puerto_Rico{
+  display:none;
+}
+
+
+
 </style>
 </head>
 <body>
@@ -153,9 +159,11 @@ var button = document.createElement('button');
 input_div.appendChild(button);
 button.innerText='Submit';
 
+
 button.onclick = function()
 {
   var xhr = new XMLHttpRequest();
+  // xhr.open("GET","/bivariate/DP03_0062E/DP03_0009PE");
   xhr.open("GET","/bivariate/"+input_first.value+"/"+input_second.value);
 
   xhr.addEventListener("load",function(e)
@@ -172,13 +180,11 @@ button.onclick = function()
       rightdiv.id="rightdiv";
       container.appendChild(rightdiv);
 
-      // var ul = document.createElement("ul");
-      // rightdiv.appendChild(ul);
-
       var ul = d3.select('#rightdiv').append('ul');
 
       var margin = {top: 50, right: 100, bottom: 30, left: 55},
-          width = 1060 - margin.left - margin.right,
+          // width = 1060 - margin.left - margin.right,
+          width = 700 - margin.left - margin.right,
           height = 550 - margin.top - margin.bottom;
 
       var x = d3.scale.linear()
@@ -202,8 +208,6 @@ button.onclick = function()
       .y(y)
       .scaleExtent([1, 32])
 
-
-
       var svg = d3.select("#leftdiv").append("svg")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height + margin.top + margin.bottom)
@@ -224,7 +228,7 @@ button.onclick = function()
       .defer(d3.json, "./states_regions.json")
       .await(ready);
 
-      function ready(error,map,data,region)
+      function ready(error,map,data,region,variables)
       {
         data.forEach(function(d)
         {
@@ -238,6 +242,18 @@ button.onclick = function()
         x.domain(d3.extent(data, function(d) { return d.rate_one; })).nice();
         y.domain(d3.extent(data, function(d) { return d.rate_two; })).nice();
 
+        var xhr2 = new XMLHttpRequest();
+        xhr2.open("GET","/choropleths/variables");
+
+        xhr2.addEventListener("load",function(e)
+          {
+            var d = xhr2.responseText;
+            var parsed = JSON.parse(d);
+
+            var filtered = _.filter(parsed,function(o){return o.c_id===input_first.value});
+            var filtered2 = _.filter(parsed,function(o){return o.c_id===input_second.value});
+            console.log(filtered);
+
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
@@ -247,7 +263,7 @@ button.onclick = function()
             .attr("x", width)
             .attr("y", -6)
             .style("text-anchor", "end")
-            .text("% of individuals 25 years or older with Bachelors Degrees or Higher")
+            .text(filtered[0].indicator1+" : "+filtered[0].indicator2)
 
         svg.append("g")
             .attr("class", "y axis")
@@ -258,14 +274,13 @@ button.onclick = function()
             .attr("y", 6)
             .attr("dy", ".71em")
             .style("text-anchor", "end")
-            .text("Median Household Income - Dollars");
-
+            .text(filtered2[0].indicator1+" : "+filtered2[0].indicator2)
 
         svg.selectAll(".dot")
             .data(data)
           .enter().append("circle")
             .attr("class", "dot")
-            .attr("r", 3.5)
+            .attr("r", 2.5)
             .attr("cx", function(d) { return x(d.rate_one); })
             .attr("cy", function(d) { return y(d.rate_two); })
             .attr("class", function(d)
@@ -283,9 +298,15 @@ button.onclick = function()
 
               var state = _.filter(region,function(o){if(d.id.substring(0,2)===o.id) return o.state});
 
-              cntyselect_text.html(filter[0].properties.name+"<br></br>"+state[0].state+"<br></br>$"+d.rate_one+"<br></br>"+d.rate_two+"%")
-                .style('padding','5px 5px 5px 5px')
-                .attr("class","first_dataset");
+              cntyselect_text.html("<strong>"+filter[0].properties.name+"</strong><br></br><strong>"+state[0].state+"</strong><br></br> "+filtered[0].indicator3+" : <strong>"+d.rate_one+"</strong><br></br>"+filtered2[0].indicator3+" : <strong>"+d.rate_two+"</strong>")
+                             .style('padding','5px 5px 5px 5px')
+                             .attr("class","first_dataset");
+
+              var filtercolor = _.filter(region,function(o){if(d.id.substring(0,2)===o.id) return o.color});
+
+              var strong = d3.selectAll("strong")
+              .style('color',filtercolor[0].color)
+              .style('font-size','12px')
 
                             svg
                                 .append('line')
@@ -312,9 +333,7 @@ button.onclick = function()
             {
               d3.selectAll('.crosshair')
               .style('display','none')
-            })
-
-
+            });
 
         var legend = svg.selectAll(".legend")
             .data(color.domain())
@@ -343,6 +362,35 @@ button.onclick = function()
                   {return 'Select State'}
                   else {return d.state.toUpperCase()}})
                 .attr("class", function(d){return 'region_'+d.region+" state_"+ d.state.replace(" ","_")})
+                .on('click',function(d)
+                {
+                  var state = false;
+                  var state_dots = d3.selectAll("."+d.state.replace(" ","_"));
+
+                  if(state===false)
+                  {
+                  for(i=0;i<state_dots[0].length;i++)
+                  {state_dots[0][i].setAttribute("class",state_dots[0][i].classList[0]+" "+state_dots[0][i].classList[1]+" selected "+state_dots[0][i].classList[3])};
+
+                  state_dots.style("opacity",1)
+
+                  var not_selected = d3.selectAll(".not_selected")
+                  .transition()
+                  .duration(4000)
+                  .style("opacity",0)
+                  .style('fill','grey')
+
+                  for(i=0;i<not_selected[0].length;i++)
+                  {not_selected[0][i].classList[4]="mouseover"}
+
+                  var mouseover = d3.selectAll('.mouseover')
+                  .transition()
+                  .duration(3000)
+                  .attr('r',0)
+                  console.log(not_selected);
+                  state = true;
+                  };
+                })
                 .on('mouseover',function(d)
                 {
                   var state_dots = d3.selectAll("."+d.state.replace(" ","_"));
@@ -355,13 +403,19 @@ button.onclick = function()
 
                   var not_selected = d3.selectAll(".not_selected")
 
-                  // .transition()
-                  // .duration(4000)
+
+
 
                   for(i=0;i<not_selected[0].length;i++)
                   {not_selected[0][i].setAttribute("class",not_selected[0][i].classList[0]+" "+not_selected[0][i].classList[1]+" "+not_selected[0][i].classList[2]+" "+not_selected[0][i].classList[3]+" mouseover")};
+
                   not_selected
                   .style("opacity",.2)
+
+                  var mouseover = d3.selectAll('.mouseover')
+                  .transition()
+                  .duration(3000)
+                  .attr('r',3.5)
 
                 })
                 .on('mouseout',function(d)
@@ -379,21 +433,9 @@ button.onclick = function()
                   };
 
                   dots
-                  .style("opacity",1);
-                })
-                .on('click',function(d)
-                {
-                  var state_dots = d3.selectAll("."+d.state.replace(" ","_"));
-
-                  state_dots
-                  .attr("class",class0+" "+class1+" selected "+class3)
                   .style("opacity",1)
-
-                  var not_selected = d3.selectAll(".not_selected")
-                  .transition()
-                  .duration(4000)
-                  .style("opacity",0)
                 })
+
                 .style('border-left',function(d){return '15px solid '+d.color})
                 .style('color',function(d){return d.color})
 
@@ -418,7 +460,7 @@ button.onclick = function()
                 .attr('class',function(d){return d})
                 .on('mouseover',function(d)
                   {
-                    var state_dots = d3.selectAll(".dot."+d); //WEST
+                    var state_dots = d3.selectAll(".dot."+d);
 
                     for(i=0;i<state_dots[0].length;i++)
                     {state_dots[0][i].setAttribute("class",state_dots[0][i].classList[0]+" "+state_dots[0][i].classList[1]+" selected "+state_dots[0][i].classList[3])};
@@ -458,7 +500,11 @@ button.onclick = function()
                     .style("opacity",1)
 
                     ;
-                  })
+                  });
+
+          });
+
+          xhr2.send();
       };
 
     });
