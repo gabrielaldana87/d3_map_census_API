@@ -31,11 +31,15 @@ div{
   background-color:#663398;
 }*/
 
+
+.modal-body{
+  margin-right:5%;
+}
+
 h3{
   font-family: Avenir Next;
   color:#6D7A8A;
   text-align: center;
-
 }
 
 h6{
@@ -53,6 +57,23 @@ width:100%;
 
 img.img-responsive:hover{
   opacity:1;
+}
+
+.higher{
+  color: red;
+}
+
+.lower{
+  color: green;
+}
+
+.click{
+  color: steelblue;
+}
+
+.hover{
+  color: steelblue;
+  opacity: .7;
 }
 
 </style>
@@ -104,10 +125,10 @@ img.img-responsive:hover{
       </h4>
       <p>
          County color scheme based on 5 US region for comparative regional filtering.<br>
-         Hover over dot elements for individual county data points.<br>
-         Hover over region name to animate filtering of regional data points.<br>
-         Hover over state name for animation filtering of county.<br>
-         Click on state name to filter data for inspection of individual state data points.<br>
+         <strong class='hover'>Hover</strong> over dot elements for individual county data points.<br>
+         <strong class='hover'>Hover</strong> over region name to animate filtering of regional data points.<br>
+         <strong class='hover'>Hover</strong> over state name for animation filtering of county.<br>
+         <strong class='click'>Click</strong> on state name to filter data for inspection of individual state data points.<br>
        </p>
        <h6>Data Source: 2013 American Community Survery (ACS) - 3 Year Summary File</h6>
       <form class="form-horizontal">
@@ -134,10 +155,10 @@ img.img-responsive:hover{
          Interactive maps rendering unique US Census variables for all US counties ; color gradiation based on particular variable value
       </h4>
       <p>
-         Hover over individual county for county name and variable value.<br>
-         Click on individual county to recolor US map to filter counties with higher values relative to selection<br>
-         Hover over state name for animation filtering of county.<br>
-         Click on state name to filter data for inspection of individual state data points.<br>
+         <strong class='hover'>Hover</strong> over individual county for county name and variable value.<br>
+         <strong class='click'>Click</strong> on individual county to recolor US map to filter counties with higher values relative to selection<br>
+        <strong class='click'>Click</strong> on grey box in top right color to toggle between counties with <strong class='higher'>higher</strong> and <strong class='lower'>lower</strong> values relative to county clicked.<br>
+         To<strong class='click'> Zoom</strong> in and out of map: Place two digits on keypad and bring both digits up to zoom in. Bring both digits down to zoom out.<br>
        </p>
        <h6>Data Source: 2013 American Community Survery (ACS) - 3 Year Summary File</h6>
       <form class="form-horizontal">
