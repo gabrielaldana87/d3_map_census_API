@@ -120,3 +120,277 @@ display:none;
 .state_Puerto_Rico{
 display:none;
 }
+
+path{
+  stroke-width:.2;
+  stroke-linejoin:round;
+  stroke:grey;
+  fill:#f0f4f4;
+  cursor: pointer;
+}
+path:hover{
+  stroke:red;
+  stroke-width:.9;
+}
+
+.place-label {
+  fill: #444;
+}
+
+text,li{
+  font-family: "Calibri", Helvetica, Arial, sans-serif;
+  font-size: 10px;
+  width: 40%;
+}
+
+.subunit-label{
+  fill: #777;
+  fill-opacity: .5;
+  font-size:20px;
+  font-weight:300;
+  text-anchor:middle;
+}
+
+li{
+  background: rgba(68,152,255,.8);
+  text-align: center;
+}
+
+.first_select{
+  background: rgba(68,152,255,.8);
+  margin: 5px;
+  padding: 5px 5px 5px 5px;
+  color: white;
+  height: 25px;
+  width:initial;
+  display:inline;
+}
+
+.first_select_a{
+  text-decoration: none;
+  color: white;
+}
+
+a:hover,li:hover{
+  background: rgb(28,103,255);
+}
+
+
+
+/*#container{
+  position: relative;
+}*/
+
+#leftdiv{
+  position: absolute;
+  margin-top: 2%;
+  width:20%;
+}
+
+.not_selected{
+  display: none;
+
+}
+
+.rightnav{
+  width: 25%;
+  float: right;
+}
+
+svg{
+  float: left;
+  margin-left: 15%;
+}
+
+a{
+  text-decoration: none;
+  color: white;
+}
+
+.q0-9 { fill:#004F44; }
+.q1-9 { fill:#009B7C; }
+.q2-9 { fill:#3CBB90; }
+.q3-9 { fill:#B9DEBD; }
+.q4-9 { fill:#f4f2cb; }
+.q5-9 { fill:#FBAF4D; }
+.q6-9 { fill:#FF8E88; }
+.q7-9 { fill:#FF473D; }
+.q8-9 { fill:#FF180E; }
+.q9-9 { fill:#BF0A00; }
+
+#tooltip{
+  position: absolute;
+  z-index: 2;
+  background: rgba(0,153,76,.8);
+  width: 130px;
+  height: 20px;
+  color: white;
+  font-size: 14px;
+  padding: 5px;
+  top: -150px;
+  left: -150px;
+  font-family: "Calibri";
+}
+
+li{
+  background: #22A7F0;
+  text-align: center;
+}
+
+.headerdiv {
+position: absolute;
+margin-left: 420px;
+width: 300px;
+margin-right: auto;
+font-family: Calibri;
+text-align: center;
+}
+
+.title_header{
+  margin-top:0px;
+  margin-bottom:0px;
+}
+
+h2{
+  font-size: 16px;
+}
+h3,h4{
+  font-size: 12px;
+}
+
+.subcategory{
+  position:absolute;
+  width: 20%;
+  /*height: 100%;*/
+  float: left;
+}
+
+li.li_indic3 {
+  height:30px;
+  margin-top: -11px;
+  float: left;
+  background-color: #2574A9;
+  width: 120px;
+  height: 100%;
+}
+
+.li_indic4{
+  border-top: 3px solid white;
+  height:30px;
+  /*margin-left: -150px;*/
+  display: inside;
+  width: 120px;
+}
+
+.li_indic3 {
+  margin-bottom: 78px;
+}
+
+.click-nav {
+  margin:0px 0px 5px 0px;
+  width:200px;
+  position:absolute;
+}
+
+.click-nav ul {
+  font-weight:900;
+  width:100%;
+}
+.click-nav ul li {
+  /*position:relative;*/
+  list-style:none;
+  cursor:pointer;
+}
+.click-nav ul li ul {
+  position:absolute;
+  left:0;
+  right:0;
+}
+.click-nav ul .clicker {
+  background:#2284B5;
+  color:#FFF;
+  margin-bottom: 5px;
+  width:60%;
+  height: 70px;
+  font-size:10px;
+}
+.click-nav ul .clicker:hover,
+.click-nav ul .active {
+  background:#196F9A;
+}
+
+.click-nav ul li a {
+  transition:background-color 0.5s ease-in-out;
+  -webkit-transition:background-color 0.5s ease-in-out;
+  -moz-transition:background-color 0.5s ease-in-out;
+  display:block;
+  padding:8px 10px 8px 40px;
+  background:#FFF;
+  color:#333;
+  text-decoration:none;
+}
+
+.county_comp{
+  position: absolute;
+  top: 60px;
+  right: 40px;
+  font-family: Calibri;
+  background-color: #F0F4F4;
+  width: 248px;
+}
+
+ul.no-js{
+  padding-left: 20px;
+  /*margin-left: 0px;*/
+}
+
+.click-nav ul li a:hover {
+  background:#F2F2F2;
+}
+/* Fallbacks */
+.click-nav .no-js ul {
+  display:none;
+  margin-left: 130px;
+}
+
+.not_selected2 {
+  display:none !important;
+}
+
+div .not_selected2 {
+  display:none !important;
+}
+
+.selected:hover ul {
+  display:block;
+}
+
+.click-nav .no-js ul .not_selected2{
+  display: none;
+}
+
+.no-js ul
+
+div#rightdiv_choro{
+  display: inline-block;
+}
+
+div.bar {
+    display: inline-block;
+    width: 20px;
+    height: 75px;   /* We'll override this later */
+    background-color: teal;
+}
+
+.text_box{
+  position: absolute;
+  left:200px;
+  width:200px;
+  height:100px;
+  background-color:red;
+}
+
+text.choro_box_text{
+  font-style: italic;
+  font-size: 10px;
+}

@@ -8,11 +8,13 @@
 
 
 <style>
-div{
+/*div{
   margin-left:5%;
-}
+}*/
 .col-md-3{
   margin-top:5%;
+  margin-left:5%;
+  
 }
 
 .col-md-3:hover{
@@ -85,6 +87,7 @@ img.img-responsive:hover{
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v1.min.js"></script>
 
+
 <div class = "container-fluid">
 
 <div class = "row page-header">
@@ -124,7 +127,7 @@ img.img-responsive:hover{
          Interactive scatterplots rendering two US Census variables on X and Y axis; joined on US county.
       </h4>
       <p>
-         County color scheme based on 5 US region for comparative regional filtering.<br>
+         County color scheme based on 5 US region for comparative regional filtering.<br></br>
          <strong class='hover'>Hover</strong> over dot elements for individual county data points.<br>
          <strong class='hover'>Hover</strong> over region name to animate filtering of regional data points.<br>
          <strong class='hover'>Hover</strong> over state name for animation filtering of county.<br>
@@ -162,7 +165,38 @@ img.img-responsive:hover{
        </p>
        <h6>Data Source: 2013 American Community Survery (ACS) - 3 Year Summary File</h6>
       <form class="form-horizontal">
-      <button type="button" class="btn btn-primary" id="bivar_button" href="/us_map_indicators.html">Open</button>
+      <button type="button" class="btn btn-primary" id="choropleth_button" href="/us_map_indicators.html">Open</button>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+<div class= "row">
+<div class="modal fade" id="modal_stopandfrisk">
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><!-- the small little x that closes -->
+      <h4 class="modal-title text-center" id="myModalLabel">Stop and Frisk : NYC 2014</h4>
+    </div>
+    <div class="modal-body" id="modal-body">
+       <img src="stopandfrisk_modal.png" data-toggle="modal" data-target="#modal_stopandfrisk" class="img-responsive center-block" alt="Responsive image">
+       <br></br>
+       <h4>
+         Map of Stop and Frisk incidents by geolocational coordinates
+      </h4>
+      <p>
+         45,000 incidents rendered as goelocational dots over map of NYC zip codes.<br></br>
+         Color scheme based on racial categories as established by the NYPD.<br></br>
+        <strong class='click'>Click</strong> on blue sidebars to explore stops which yielded contraband or assault weapons.<br>
+         To<strong class='click'> Zoom</strong> in and out of map: Place two digits on keypad and bring both digits up to zoom in. Bring both digits down to zoom out.<br>
+       </p>
+       <h6>Data Source: Thank you to BetaNYC<br>http://data.beta.nyc/dataset/stop-question-and-frisk-data</h6>
+      <form class="form-horizontal">
+      <button type="button" class="btn btn-primary" id="stopandfrisk_button" href="/us_map_indicators.html">Open</button>
       </form>
     </div>
   </div>
@@ -221,5 +255,7 @@ animation
 <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="/splash.js"></script>
+<script src="/choropleth.js"></script>
+<script src="./squares.js"></script>
 </body>
 </html>

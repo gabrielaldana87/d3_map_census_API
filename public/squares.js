@@ -9,6 +9,8 @@ function Rectangle(name,num,not_square,cx,cy,line,branch_length,vert_length,colo
   this.cx= cx,
   this.cy= cy,
   this.createRight= function(){
+
+    var svg = d3.select("svg");
     var dots_array = [];
     for(i=0;i<num;i++)
     {
@@ -24,6 +26,7 @@ function Rectangle(name,num,not_square,cx,cy,line,branch_length,vert_length,colo
         .attr('fill',color)
   },
   this.createLeft= function(){
+    var svg = d3.select("svg");
     var dots_array = [];
     for(i=0;i<num;i++)
     {
@@ -39,6 +42,7 @@ function Rectangle(name,num,not_square,cx,cy,line,branch_length,vert_length,colo
         .attr('fill',color)
   },
   this.createTop= function(){
+    var svg = d3.select("svg");
     var dots_array = [];
     for(i=0;i<not_square;i++)
     {
@@ -54,6 +58,7 @@ function Rectangle(name,num,not_square,cx,cy,line,branch_length,vert_length,colo
         .attr('fill',color)
   },
   this.createBottom = function(){
+    var svg = d3.select("svg");
     var dots_array = [];
     for(i=0;i<=not_square;i++)
     {
@@ -70,6 +75,7 @@ function Rectangle(name,num,not_square,cx,cy,line,branch_length,vert_length,colo
   },
   this.createText = function(){
    var lines =  line.split('^');
+   var svg = d3.select("svg");
     svg.selectAll('.'+name+'_text')
             .data(lines)
             .enter()
@@ -85,6 +91,7 @@ function Rectangle(name,num,not_square,cx,cy,line,branch_length,vert_length,colo
     },
     this.branch_length = branch_length,
     this.createBranchHorizLeft = function(){
+      var svg = d3.select("svg");
     var dots_array = [];
     for(i=0;i<=branch_length;i++)
     {
@@ -100,6 +107,7 @@ function Rectangle(name,num,not_square,cx,cy,line,branch_length,vert_length,colo
         .attr('fill',color)
   },
   this.createBranchHorizRight = function(){
+  var svg = d3.select("svg");
   var dots_array = [];
   for(i=0;i<=branch_length;i++)
   {
@@ -115,6 +123,7 @@ function Rectangle(name,num,not_square,cx,cy,line,branch_length,vert_length,colo
       .attr('fill',color)
 },
 this.createBranchVertRight = function(){
+var svg = d3.select("svg");
 var dots_array = [];
 for(i=0;i<=vert_length;i++)
 {
