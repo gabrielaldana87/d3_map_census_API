@@ -20,6 +20,12 @@ fs.readFile("./key.txt",function(e,data)
 {
   var key = data.toString();
 
+app.get('/visualizations',function(req,res)
+{
+  res.sendFile(__dirname + '/public/bivar_splash.html');
+});
+
+
 app.get('/choropleths',function(req,res)
 {
   res.sendFile(__dirname + '/public/us_map_indicators.html');
