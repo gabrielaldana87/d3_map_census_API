@@ -6,7 +6,7 @@ var sqlite3 = require("sqlite3").verbose();
 var cors = require('cors');
 
 var db = new sqlite3.Database("mapping.db");
-var db2 = new sqlite3.Database("./csv2sqlite/stop_frisk.db")
+var db2 = new sqlite3.Database("stop_frisk.db")
 
 var app = express();
 app.use(cors());
