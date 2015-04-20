@@ -26,6 +26,11 @@ app.get('/visualizations',function(req,res)
 });
 
 
+app.get('/about_me', function(req,res)
+{
+  res.sendFile(__dirname + '/public/about_me.html');
+});
+
 app.get('/choropleths',function(req,res)
 {
   res.sendFile(__dirname + '/public/us_map_indicators.html');
@@ -252,7 +257,7 @@ app.get('/bivariate/:indicator1/:indicator2',function(req,res)
 
 
 });
-var server = app.listen(3000,function()
+var server = app.listen(80,function()
 {
   console.log("listening on port 80")
 });
