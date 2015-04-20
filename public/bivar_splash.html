@@ -14,7 +14,7 @@
 .col-md-3{
   margin-top:5%;
   margin-left:5%;
-  
+
 }
 
 .col-md-3:hover{
@@ -93,9 +93,7 @@ img.img-responsive:hover{
 <div class = "row page-header">
    <h1 class = "col-md-4 text-center">Data Visualizations</h1>
    <div class="col-md-2 col-md-offset-6">
-   <a class="btn btn-default" href="cart.html" role="button" id="cart">CART
-   <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span></a>
-   <a class="btn btn-default" role="button" id="login" data-toggle="modal" data-target="#loginmodal">LOGIN</a>
+   <a class="btn btn-default" role="button"  onclick="location.href='/about_me'" id="about_me" data-toggle="modal" data-target="#loginmodal"><img src=glyphicons-499-sunglasses.png>  About Me</a>
  </div>
 </div>
 
@@ -109,7 +107,6 @@ img.img-responsive:hover{
   <div class = "col-md-3 thumbnail top" id="stopandfrisk">
     <img src="./stopandfrisk.png" data-toggle="modal" data-target="#modal_stopandfrisk" class="img-responsive" alt="Responsive image">
   </div>
-
 </div>
 
 <div class= "row">
@@ -164,8 +161,8 @@ img.img-responsive:hover{
          To<strong class='click'> Zoom</strong> in and out of map: Place two digits on keypad and bring both digits up to zoom in. Bring both digits down to zoom out.<br>
        </p>
        <h6>Data Source: 2013 American Community Survery (ACS) - 3 Year Summary File</h6>
-      <form class="form-horizontal">
-      <button type="button" class="btn btn-primary" id="choropleth_button" href="/us_map_indicators.html">Open</button>
+      <form class="form-horizontal" action="/choropleths">
+        <button onclick="location.href='/choropleths'" type="button" class="btn btn-primary" id="choropleth_button">Open</button>
       </form>
     </div>
   </div>
@@ -195,38 +192,9 @@ img.img-responsive:hover{
          To<strong class='click'> Zoom</strong> in and out of map: Place two digits on keypad and bring both digits up to zoom in. Bring both digits down to zoom out.<br>
        </p>
        <h6>Data Source: Thank you to BetaNYC<br>http://data.beta.nyc/dataset/stop-question-and-frisk-data</h6>
-      <form class="form-horizontal">
-      <button type="button" class="btn btn-primary" id="stopandfrisk_button" href="/us_map_indicators.html">Open</button>
+      <form class="form-horizontal" action="/stopandfrisk">
+      <button onclick="location.href='/stopandfrisk'" type="button" class="btn btn-primary" id="stopandfrisk_button" href="/us_map_indicators.html">Open</button>
       </form>
-    </div>
-  </div>
-</div>
-</div>
-</div>
-
-<div class= "row">
-<div class="modal fade" id="loginmodal">
-<div class="modal-dialog">
-  <div class="modal-content">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><!-- the small little x that closes -->
-      <h4 class="modal-title text-center" id="myModalLabel">LOGIN</h4>
-    </div>
-    <div class="modal-body" id="modal-body">
-      <form action="http://localhost:4567/user" method="POST">
-        <h3>CREATE A LOGIN</h3>
-       <input name = "username" placeholder="username">
-       <input name = "password" type="password" placeholder="password">
-       <input name = "confirm_password" type="password" placeholder="confirm password">
-       <button class="btn btn-primary" id="modallog">CREATE</button>
-      </form>
-
-      <form action="session" method="POST">
-        <h3>ADMIN LOGIN</h3>
-       <input name = "username" placeholder="username">
-       <input name = "password" type="password" placeholder="password">
-       <button type="button" class="btn btn-primary" id="modallog">LOGIN</button>
-     </form>
     </div>
   </div>
 </div>

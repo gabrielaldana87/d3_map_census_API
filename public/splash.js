@@ -1,5 +1,4 @@
 var bivar = document.querySelector("#bivar_button");
-console.log(bivar);
 
 bivar.addEventListener("click",function()
 {
@@ -139,6 +138,7 @@ bivar.addEventListener("click",function()
                   var filtered = _.filter(parsed,function(o){return o.c_id==="DP03_0062E"});
                   var filtered2 = _.filter(parsed,function(o){return o.c_id===metric_this.id});
                   console.log(filtered);
+                  console.log(filtered2);
 
               svg.append("g")
                   .attr("class", "x axis")

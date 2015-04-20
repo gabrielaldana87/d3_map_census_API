@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+</head>
+<style>
+
+path{
+  stroke-width:.5;
+  stroke-linejoin:round;
+  /*stroke:white;*/
+  fill:lightgrey;
+}
+path:hover{
+  stroke:red;
+  stroke-width:1;
+}
+
+svg{
+  background-color:white;
+}
+.place-label {
+  fill: #444;
+}
+
+text{
+  font-family: "Calibri", Helvetica, Arial, sans-serif;
+  font-size: 10px;
+}
+
+.subunit-label{
+  fill: #777;
+  fill-opacity: .5;
+  font-size:20px;
+  font-weight:300;
+  text-anchor:middle;
+}
+
+
+.q0-9 { fill:#A70000; }
+.q1-9 { fill:#FF0000; }
+.q2-9 { fill:#FF5252; }
+.q3-9 { fill:#FF7B7B; }
+.q4-9 { fill:#FFBABA; }
+.q5-9 { fill:#A4E6F4; }
+.q6-9 { fill:#3CAAE4; }
+.q7-9 { fill:#047EBC; }
+.q8-9 { fill:#0462A4; }
+.q9-9 { fill:#044284; }
+
+#tooltip{
+  position: absolute;
+  z-index: 2;
+  background: rgba(0,153,76,.8);
+  width: 130px;
+  height: 20px;
+  color: white;
+  font-size: 14px;
+  padding: 5px;
+  top: -150px;
+  left: -150px;
+  font-family: "Calibri";
+}
+
+</style>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/queue.v1.min.js"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script>
+  var width = 1000,
+      height = 600;
+
+      var projection = d3.geo.mercator()
+      .center([-73.6967, 40.95])
+      .scale(8600)
+      .translate([width / 2, height / 2]);
+
+  var path = d3.geo.path()
+      .projection(projection);
+
+  var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+  d3.json("./states.json", function(error, us) {
+    if (error) return console.error(error);
+    console.log(us);
+
+
+    svg.append("g")
+    .selectAll('path')
+    .attr("class","counties")
+    .data(topojson.feature(us,us.objects.states).features)
+    .enter().append('path')
+    .attr("d",path)
+
+
+    // svg.append("path")
+    //     .datum(topojson.mesh(us))
+    //     .attr("d", path);
+  });
+  </script>
+</body>

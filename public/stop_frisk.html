@@ -45,14 +45,14 @@ button{
   position: absolute;
   top: 70px;
 }
-.A { fill: #F6AB36; }
+.A { fill: #663398;}
 .B { fill: steelblue; }
-.I { fill: #663398; }
-.P { fill: seagreen; }
+.I { fill:  grey; }
+.P { fill: #F72459; }
 .Q { fill: #F72459; }
 .W { fill: #26A65B; }
-.X { fill: grey; }
-.U { fill: grey; }
+.X { fill: #F6AB36; }
+.U { fill: #F6AB36; }
 .Z { fill: purple ; }
 
 #tooltip{
@@ -83,12 +83,12 @@ button{
 
   var body = document.querySelector('body')
   var input = document.createElement('input')
-  body.appendChild(input);
-  input.placeholder = "concept";
-
-  var button = document.createElement('button');
-  body.appendChild(button);
-  button.innerText='Submit';
+  // body.appendChild(input);
+  // input.placeholder = "concept";
+  //
+  // var button = document.createElement('button');
+  // body.appendChild(button);
+  // button.innerText='Submit';
 
   var width = 1500,
       height = 1600,
@@ -96,8 +96,12 @@ button{
 
 
   var color = d3.scale.ordinal()
-                .range(["steelblue","#F72459","#26A65B","#3B539B","#663398","grey","purple"]);
-  var races  = ["Black","White-Hispanic","White","Black-Hispanic","Asian","American Indian/Alaskan Native","Unknown","Other"]
+                .range(["steelblue","#F72459","#26A65B","#663398","grey","#F6AB36","purple"]);
+  var races  = ["Black","Hispanic","White","Asian","American Indian/Alaskan Native","Unknown","Other"]
+
+
+  var colors = ["steelblue","#F72459","#26A65B","#663398","grey","#F6AB36","purple"];
+  var races  = ["Black","Hispanic","White","Asian","American Indian/Alaskan Native","Unknown","Other"]
 
   var arc = d3.svg.arc()
       .outerRadius(radius - 175)
@@ -159,10 +163,6 @@ button{
 
   var keys = d3.select('#leftdiv').append('div').attr('class','keys');
 
-
-  var colors = ["steelblue","#F72459","#3B539B","#26A65B","#F6AB36","#663398","grey","purple"];
-  var races  = ["Black","White-Hispanic","Black-Hispanic","White","Asian","American Indian/Alaskan Native","Unknown","Other"]
-
   var tooltip = d3.select('body').append('div')
   .style('position', 'absolute')
   .style('padding', '0 10px')
@@ -183,8 +183,6 @@ button{
 
   function ready(error, us) {
 
-    console.dir(races);
-
     svg.append("g")
     .attr("class", "zips")
     .selectAll("path")
@@ -203,7 +201,7 @@ button{
     .on('mouseover', function(d) {
       tooltip.transition()
       .style('opacity', .9)
-      tooltip.html(d.id+" : "+rateById.get(d.id))
+      tooltip.html(d.id)
       .style('left', (d3.event.pageX - 35) + 'px')
       .style('top',  (d3.event.pageY - 30) + 'px')
       tempColor = this.style.fill;
@@ -225,8 +223,6 @@ button{
     {
       var d = xhr.responseText;
       var json = JSON.parse(d);
-      // console.log(json);
-
       var array =[];
 
       json.forEach(function(o)
@@ -256,7 +252,6 @@ button{
 }
 
 var result = foo(array);
-console.log(result);
 
       svg.append('g')
       .attr('class', 'zips')
@@ -277,49 +272,51 @@ console.log(result);
         .attr('class',function(d){return 'zips '+ d.race})
         .attr('id',function(d){return "C"+d.ID.toString()})
 
-          button.addEventListener('click',function(){
-
-            var xhr1 = new XMLHttpRequest();
-            xhr1.open("GET","/stopandfrisk/details/"+input.value);
-            xhr1.send();
-            xhr1.addEventListener("load",function(e)
-            {
-              var d = xhr1.responseText;
-              var concept = JSON.parse(d);
-
-              var test = d3.selectAll('circle')
-              .classed("N",true)
-              .style('opacity',.2)
-
-              for(i=0;i<concept.length;i++)
-              {
-                var picked = d3.select("#C"+concept[i].ID)
-                .classed({"N": false, "Y": true})
-                .style('opacity',1)
-              }
-
-             })
-            });
+          // button.addEventListener('click',function(){
+          //
+          //   var xhr1 = new XMLHttpRequest();
+          //   xhr1.open("GET","/stopandfrisk/details/"+input.value);
+          //   xhr1.send();
+          //   xhr1.addEventListener("load",function(e)
+          //   {
+          //     var d = xhr1.responseText;
+          //     var concept = JSON.parse(d);
+          //
+          //     var test = d3.selectAll('circle')
+          //     .classed("N",true)
+          //     .style('opacity',.2)
+          //
+          //     for(i=0;i<concept.length;i++)
+          //     {
+          //       var picked = d3.select("#C"+concept[i].ID)
+          //       .classed({"N": false, "Y": true})
+          //       .style('opacity',1)
+          //     }
+          //
+          //    })
+          //   });
 
             var color_key = d3.select(".keys")
             var rect = svg.selectAll('rect')
             .data(colors)
             .enter()
             .append('rect')
-            .attr('y',function(d,i){return 400 + i*15 + "px"})
-            .attr('x','100px')
+            .attr('y',function(d,i){return 255 + i*30 + "px"})
+            .attr('x','400px')
             .attr('fill', function(d){return d})
-            .attr('width','15px')
-            .attr('height','15px')
+            .attr('width','25px')
+            .attr('height','25px')
+
 
             svg.selectAll(".text_keys")
             .data(races)
             .enter().append('text')
-            .attr('y',function(d,i){return 407 + (i*15) +'px'})
-            .attr('x','120px')
+            .attr('y',function(d,i){return 280 + (i*30) +'px'})
+            .attr('x','430px')
             .text(function(d){ return d})
             .attr('class', 'first_dataset')
-            .style('font-size','12px');
+            .style('font-size','12px')
+            ;
 
             d3.csv("stop_and_frisk_race.csv", function(error, data) {
               data.forEach(function(d) {
@@ -331,7 +328,7 @@ console.log(result);
               var total_pop = d3.sum(data,function(d){return +d.Population});
 
               var g = svg.append('g')
-              .attr("transform", "translate(" + width / 3 + "," + height / 5 + ")")
+              .attr("transform", "translate(" + width / 5.5 + "," + height / 4.5 + ")")
               .selectAll(".arc")
                   .data(pie(data))
                 .enter().append("g")
@@ -347,10 +344,31 @@ console.log(result);
                   .style("text-anchor", "middle")
                   .text(function(d) { if(d.data.Stops/total_stops >.05) return (d3.round(d.data.Stops/ total_stops,2)*100).toString().substring(0,3) })
                   .style('font-family','Calibri')
-                  .style('fill','white');
+                  .style('fill','white')
+
+
+
+              svg.append('text')
+                .attr('y','360px')
+                .attr('x','270px')
+                .html("% of Stops by Race")
+                .style('text-anchor','middle')
+                .style('font-family','Calibri')
+                .style('font-size','12px');
+
+
+                svg.append('text')
+                  .attr('y','240px')
+                  .attr('x','270px')
+                  .html("% of NYC population by Race")
+                  .style('text-anchor','middle')
+                  .style('font-family','Calibri')
+                  .style('font-size','12px');
+
+
 
                 var g2 = svg.append('g')
-                .attr("transform", "translate(" + width / 3 + "," + height / 5 + ")")
+                .attr("transform", "translate(" + width / 5.5 + "," + height / 4.5 + ")")
                   .selectAll('.arc2')
                   .data(pie2(data))
                   .enter().append('g')
@@ -368,11 +386,7 @@ console.log(result);
                   .style('font-family','Calibri')
                   .style('fill','white');
 
-
-
             });
-
-
     });
 
   };

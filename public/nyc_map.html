@@ -123,7 +123,6 @@ text{
     {
       var rateclick = rateById.get(d.id);
       var paths = d3.select('path')
-
       var pathclick = d3.selectAll('path');
       pathclick.attr("class",function(d){ if (rateById.get(d.id) >= rateclick){ return quantize(rateById.get(d.id))}})
 
