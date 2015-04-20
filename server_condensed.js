@@ -257,7 +257,7 @@ app.get('/bivariate/:indicator1/:indicator2',function(req,res)
 
 
 });
-var server = app.listen(80,function()
+var server = app.listen(3000,function()
 {
-  console.log("listening on port 80")
+  console.log("listening on port 3000")
 });
