@@ -19,7 +19,7 @@ var array = [];
     {
       for(i=0;i<read.features.length;i++)
      {
-         if(inside([o.Latitude,o.Longitude], read.features[i].geometry.coordinates[0])===true)
+         if(inside([o.Longitude,o.Latitude], read.features[i].geometry.coordinates[1])===true)
          {
            console.log(o.ID+":"+read.features[i].properties.ZCTA5CE10);
           var datum =
