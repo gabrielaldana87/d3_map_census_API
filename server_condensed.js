@@ -16,15 +16,14 @@ var array2 = [];
 
 app.use(express.static(__dirname + '/public'));
 
-fs.readFile("./key.txt",function(e,data)
-{
-  var key = data.toString();
+// fs.readFile("./key.txt",function(e,data)
+// {
+//   var key = data.toString();
 
 app.get('/visualizations',function(req,res)
 {
   res.sendFile(__dirname + '/public/bivar_splash.html');
 });
-
 
 app.get('/about_me', function(req,res)
 {
@@ -187,7 +186,7 @@ app.get('/stopandfrisk/details',function(req,res)
 {
   if(req.params.indicator!=='favicon.ico')
     {
-          db2.all("SELECT ID, Longitude, Latitude, race FROM data",
+          db2.all("select distinct Longitude, Latitude, race, count(*) as totals from data group by Longitude,Latitude,race order by totals desc",
           function(err, row)
             {
             if(err) {throw err;}
@@ -256,8 +255,8 @@ app.get('/bivariate/:indicator1/:indicator2',function(req,res)
 });
 
 
-});
-var server = app.listen(80,function()
+// });
+var server = app.listen(3000,function()
 {
   console.log("listening on port 80")
 });

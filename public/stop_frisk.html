@@ -73,6 +73,17 @@ button{
   fill:black;
 }
 
+.q0-9 { fill:#004F44; }
+.q1-9 { fill:#009B7C; }
+.q2-9 { fill:#3CBB90; }
+.q3-9 { fill:#B9DEBD; }
+.q4-9 { fill:#f4f2cb; }
+.q5-9 { fill:#FBAF4D; }
+.q6-9 { fill:#FF8E88; }
+.q7-9 { fill:#FF473D; }
+.q8-9 { fill:#FF180E; }
+.q9-9 { fill:#BF0A00; }
+
 </style>
 <body>
   <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -81,8 +92,16 @@ button{
   <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
   <script>
 
-  var body = document.querySelector('body')
-  var input = document.createElement('input')
+  var body = document.querySelector('body');
+  var input = document.createElement('input');
+
+  var div = document.createElement('div');
+  body.appendChild(div);
+  var p = document.createElement('p');
+  div.appendChild(p);
+
+  p.innerText='toggle';
+  div.id='toggle';
   // body.appendChild(input);
   // input.placeholder = "concept";
   //
@@ -123,7 +142,7 @@ button{
   var rateById = d3.map();
 
   var quantize = d3.scale.quantize()
-  .domain([1,76])
+  .domain([1,900])
   .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
   var projection = d3.geo.mercator()
@@ -175,22 +194,30 @@ button{
 
   queue()
   .defer(d3.json, "./topo_nyc.json")
+  .defer(d3.csv, "./stopfrisk_zipcodes.csv")
+  // .defer(d3.json, "./zips_new_york_v2.json")
   .await(ready);
 
   svg
               .call(zoom) // delete this line to disable free zooming
               .call(zoom.event);
 
-  function ready(error, us) {
+  function ready(error, us, second) {
+
+    second.forEach(function(obj)
+      {
+      rateById.set(obj.id,+obj.counts);
+      });
 
     svg.append("g")
     .attr("class", "zips")
     .selectAll("path")
     .data(topojson.feature(us,us.objects.nyc).features)
     .enter().append("path")
-    // .attr("class", function(d){return quantize(rateById.get(d.id))})
-    .attr("class", function(d){return 'Z'+d.id;})
+    .attr("class", function(d){return quantize(rateById.get(d.id))})
+    // .attr("class", function(d){return 'Z'+d.id;})
     .attr("d", path)
+    .classed("zippy",true)
     .on('click',function(d)
     {
       var rateclick = rateById.get(d.id);
@@ -199,9 +226,10 @@ button{
       pathclick.attr("class",function(d){ if (rateById.get(d.id) >= rateclick){ return quantize(rateById.get(d.id))}})
     })
     .on('mouseover', function(d) {
+      var list = _.filter(second, function(o){return o.id===d.id;});
       tooltip.transition()
       .style('opacity', .9)
-      tooltip.html(d.id)
+      tooltip.html(d.id+" : "+list[0].counts)
       .style('left', (d3.event.pageX - 35) + 'px')
       .style('top',  (d3.event.pageY - 30) + 'px')
       tempColor = this.style.fill;
@@ -224,6 +252,7 @@ button{
       var d = xhr.responseText;
       var json = JSON.parse(d);
       var array =[];
+      console.log(json)
 
       json.forEach(function(o)
       {
@@ -258,11 +287,14 @@ var result = foo(array);
       .selectAll('.dot')
         .data(json)
         .enter().append('circle')
-        .attr('r',1.8)
+        .attr('r',function(d)
+        {
+          return 1 +d.totals/1.5;
+        })
         // .attr('r',function(d){
         //   return 1.8+result[1][result[0].indexOf(d.Longitude.toString().substring(0,7)+d.Latitude.toString().substring(0,7)+d.race)]/4;
         // })
-        .style('opacity',1)
+        .style('opacity',0)
         .attr('transform', function(d){
           return 'translate('+ projection([
             d.Longitude,
@@ -270,7 +302,7 @@ var result = foo(array);
           ])+')'
         })
         .attr('class',function(d){return 'zips '+ d.race})
-        .attr('id',function(d){return "C"+d.ID.toString()})
+        // .attr('id',function(d){return "C"+d.ID.toString()})
 
           // button.addEventListener('click',function(){
           //
@@ -307,7 +339,6 @@ var result = foo(array);
             .attr('width','25px')
             .attr('height','25px')
 
-
             svg.selectAll(".text_keys")
             .data(races)
             .enter().append('text')
@@ -333,7 +364,6 @@ var result = foo(array);
                   .data(pie(data))
                 .enter().append("g")
 
-
               g.append("path")
                   .attr("d", arc)
                   .style("fill", function(d) { return color(d.data.Race); });
@@ -346,8 +376,6 @@ var result = foo(array);
                   .style('font-family','Calibri')
                   .style('fill','white')
 
-
-
               svg.append('text')
                 .attr('y','360px')
                 .attr('x','270px')
@@ -356,7 +384,6 @@ var result = foo(array);
                 .style('font-family','Calibri')
                 .style('font-size','12px');
 
-
                 svg.append('text')
                   .attr('y','240px')
                   .attr('x','270px')
@@ -364,8 +391,6 @@ var result = foo(array);
                   .style('text-anchor','middle')
                   .style('font-family','Calibri')
                   .style('font-size','12px');
-
-
 
                 var g2 = svg.append('g')
                 .attr("transform", "translate(" + width / 5.5 + "," + height / 4.5 + ")")
@@ -385,6 +410,58 @@ var result = foo(array);
                   .text(function(d){if(d.data.Population/total_pop > .03) return (d3.round(d.data.Population/ total_pop,2)*100).toString().substring(0,2)})
                   .style('font-family','Calibri')
                   .style('fill','white');
+
+              d3.select("#toggle")
+              .on("click",function()
+              {
+                var dots = document.querySelectorAll('circle')
+
+                for(i=0;i<dots.length;i++)
+                {
+                  d3.select(dots[i])
+                  .transition()
+                  .duration(i)
+                  .style('opacity',1);
+                };
+
+
+                d3.selectAll('.zippy')
+                .transition()
+                .duration(7000)
+                .style('fill','lightgrey')
+
+
+
+                //   d3.selectAll('circle')
+                //   .transition()
+                //   .duration(1000)
+                // .style('opacity',1);
+                //
+                // setTimeout(function(){
+                //   d3.selectAll('.W')
+                // .transition()
+                // .duration(1000)
+                // .style('opacity',1)},2000);
+                //
+                // setTimeout(function(){
+                //   d3.selectAll('.P')
+                //   .transition()
+                //   .duration(1000)
+                //   .style('opacity',1)},2500)
+                //
+                // setTimeout(function(){
+                //   d3.selectAll('.Q')
+                //   .transition()
+                //   .duration(1000)
+                //   .style('opacity',1)},2500)
+                //
+                // setTimeout(function(){
+                //   d3.selectAll('.B')
+                //   .transition()
+                //   .duration(1000)
+                //   .style('opacity',1)},3000)
+
+              })
 
             });
     });
