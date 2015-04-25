@@ -289,12 +289,13 @@ var result = foo(array);
         .enter().append('circle')
         .attr('r',function(d)
         {
-          return 1 +d.totals/1.5;
+          return 0;
+          // return 1 +d.totals/1.5;
         })
         // .attr('r',function(d){
         //   return 1.8+result[1][result[0].indexOf(d.Longitude.toString().substring(0,7)+d.Latitude.toString().substring(0,7)+d.race)]/4;
         // })
-        .style('opacity',0)
+        // .style('opacity',0)
         .attr('transform', function(d){
           return 'translate('+ projection([
             d.Longitude,
@@ -420,8 +421,9 @@ var result = foo(array);
                 {
                   d3.select(dots[i])
                   .transition()
-                  .duration(i)
-                  .style('opacity',1);
+                  .duration(i)    
+                  .style('opacity',1)
+                  .attr('r',function(d){return d.totals;});
                 };
 
 
