@@ -16,9 +16,9 @@ var array2 = [];
 
 app.use(express.static(__dirname + '/public'));
 
-// fs.readFile("./key.txt",function(e,data)
-// {
-//   var key = data.toString();
+fs.readFile("./key.txt",function(e,data)
+{
+  var key = data.toString();
 
 app.get('/visualizations',function(req,res)
 {
@@ -69,47 +69,47 @@ app.get('/choropleths/CREATE/:indicator',function(req, res)
 
       var request_var = function(read)
       {
-        request(url3, function(error, response, body)
-        {
-          if(!error && response.statusCode === 200)
-            {
-              var data = JSON.parse(body);
-              console.log(data.name);
-              var obj =
-              {
-                id: data.name,
-                concept: data.concept,
-                label: data.label
-              };
-              read.push(obj);
+        // request(url3, function(error, response, body)
+        // {
+        //   if(!error && response.statusCode === 200)
+        //     {
+        //       var data = JSON.parse(body);
+        //       console.log(data.name);
+        //       var obj =
+        //       {
+        //         id: data.name,
+        //         concept: data.concept,
+        //         label: data.label
+        //       };
+        //       read.push(obj);
+        //
+        //       fs.writeFile("./public/variables.json", JSON.stringify(read),function(e)
+        //       {
+        //         console.log("Variable added!");
+        //       });
+        //     }
+        // });
 
-              fs.writeFile("./public/variables.json", JSON.stringify(read),function(e)
-              {
-                console.log("Variable added!");
-              });
-            }
-        });
-
-        request(url, function(error, response, body)
-          {
-          if(!error && response.statusCode === 200)
-            {
-            var data = JSON.parse(body);
-            data.forEach(function(fips)
-              {
-              var obj =
-                {
-                id: fips[1]+fips[2],
-                rate: parseFloat(fips[0])
-                };
-              array.push(obj);
-              });
-              fs.writeFile("./public/"+req.params.indicator+".json", JSON.stringify(array),function(e)
-              {
-                console.log("County variable written!");
-              });
-            }
-          });
+        // request(url, function(error, response, body)
+        //   {
+        //   if(!error && response.statusCode === 200)
+        //     {
+        //     var data = JSON.parse(body);
+        //     data.forEach(function(fips)
+        //       {
+        //       var obj =
+        //         {
+        //         id: fips[1]+fips[2],
+        //         rate: parseFloat(fips[0])
+        //         };
+        //       array.push(obj);
+        //       });
+        //       fs.writeFile("./public/"+req.params.indicator+".json", JSON.stringify(array),function(e)
+        //       {
+        //         console.log("County variable written!");
+        //       });
+        //     }
+        //   });
 
         request(url2, function(error, response, body)
         {
@@ -186,7 +186,7 @@ app.get('/stopandfrisk/details',function(req,res)
 {
   if(req.params.indicator!=='favicon.ico')
     {
-          db2.all("select distinct Longitude, Latitude, race, count(*) as totals from data group by Longitude,Latitude,race order by totals desc",
+          db2.all("select distinct Longitude, Latitude, race, count(*) as totals from data group by Longitude,Latitude,race order by Latitude desc",
           function(err, row)
             {
             if(err) {throw err;}
@@ -255,7 +255,7 @@ app.get('/bivariate/:indicator1/:indicator2',function(req,res)
 });
 
 
-// });
+});
 var server = app.listen(3000,function()
 {
   console.log("listening on port 80")

@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" href="./bootstrap-toggle-master/css/bootstrap-toggle.css"
 </head>
 <style>
 
@@ -13,6 +16,10 @@ path{
 path:hover{
   stroke:red;
   stroke-width:1;
+}
+
+div{
+  width: 200px;
 }
 
 svg{
@@ -33,6 +40,11 @@ text{
   font-size:20px;
   font-weight:300;
   text-anchor:middle;
+}
+
+.div_leftcorner{
+  margin-left:60px;
+  margin-top:60px;
 }
 
 
@@ -74,22 +86,25 @@ button{
 }
 
 .q0-9 { fill:#004F44; }
-.q1-9 { fill:#009B7C; }
-.q2-9 { fill:#3CBB90; }
-.q3-9 { fill:#B9DEBD; }
-.q4-9 { fill:#f4f2cb; }
-.q5-9 { fill:#FBAF4D; }
-.q6-9 { fill:#FF8E88; }
-.q7-9 { fill:#FF473D; }
-.q8-9 { fill:#FF180E; }
-.q9-9 { fill:#BF0A00; }
+.q1-9 { fill:#3CBB90; }
+.q2-9 { fill:#B9DEBD; }
+.q3-9 { fill:#f4f2cb; }
+.q4-9 { fill:#FF8E88; }
+.q5-9 { fill:#FF180E; }
+.q6-9 { fill:#BF0A00; }
+
 
 </style>
 <body>
+
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="http://d3js.org/queue.v1.min.js"></script>
   <script src="http://d3js.org/topojson.v1.min.js"></script>
   <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  <script src="./bootstrap-toggle-master/js/bootstrap-toggle.min.js"></script>
+
   <script>
 
   var body = document.querySelector('body');
@@ -97,14 +112,19 @@ button{
 
   var div = document.createElement('div');
   body.appendChild(div);
-  var p = document.createElement('p');
-  div.appendChild(p);
+  div.setAttribute('class','div_leftcorner')
+  var input = document.createElement('input');
+  input.type='checkbox';
+  input.checked;
+  input.setAttribute('data-toggle','toggle');
+  input.setAttribute('data-off','Race & Incidents');
+  input.setAttribute('data-on','Zipcodes & Incidents');
+  div.appendChild(input);
 
-  p.innerText='toggle';
-  div.id='toggle';
+
+  // div.id='toggle';
   // body.appendChild(input);
   // input.placeholder = "concept";
-  //
   // var button = document.createElement('button');
   // body.appendChild(button);
   // button.innerText='Submit';
@@ -114,13 +134,17 @@ button{
       radius = Math.min(width, height) / 6;
 
 
+
   var color = d3.scale.ordinal()
                 .range(["steelblue","#F72459","#26A65B","#663398","grey","#F6AB36","purple"]);
-  var races  = ["Black","Hispanic","White","Asian","American Indian/Alaskan Native","Unknown","Other"]
-
-
   var colors = ["steelblue","#F72459","#26A65B","#663398","grey","#F6AB36","purple"];
+  var colors_zips = ["#004F44","#3CBB90","#B9DEBD","#f4f2cb","#FF8E88","#FF180E","#BF0A00"];
+
   var races  = ["Black","Hispanic","White","Asian","American Indian/Alaskan Native","Unknown","Other"]
+
+  var value = d3.scale.ordinal()
+      .domain(colors_zips)
+      .rangeBands([1,820])
 
   var arc = d3.svg.arc()
       .outerRadius(radius - 175)
@@ -142,8 +166,8 @@ button{
   var rateById = d3.map();
 
   var quantize = d3.scale.quantize()
-  .domain([1,900])
-  .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
+  .domain([1,820])
+  .range(d3.range(7).map(function(i){return "q"+i+"-9"}))
 
   var projection = d3.geo.mercator()
   .center([-73.9667, 40.7172])
@@ -195,11 +219,10 @@ button{
   queue()
   .defer(d3.json, "./topo_nyc.json")
   .defer(d3.csv, "./stopfrisk_zipcodes.csv")
-  // .defer(d3.json, "./zips_new_york_v2.json")
   .await(ready);
 
   svg
-              .call(zoom) // delete this line to disable free zooming
+              // .call(zoom) // delete this line to disable free zooming
               .call(zoom.event);
 
   function ready(error, us, second) {
@@ -251,36 +274,6 @@ button{
     {
       var d = xhr.responseText;
       var json = JSON.parse(d);
-      var array =[];
-      console.log(json)
-
-      json.forEach(function(o)
-      {
-        array.push(o.Longitude.toString().substring(0,7)+o.Latitude.toString().substring(0,7)+o.race);
-      });
-
-      function foo(arr) {
-        var a = [], b = [], prev;
-
-        arr.sort();
-        for ( var i = 0; i < arr.length; i++ )
-        {
-            if ( arr[i] !== prev )
-            {
-            a.push(arr[i]);
-            b.push(1);
-            } else
-
-            {
-            b[b.length-1]++;
-            }
-            prev = arr[i];
-        }
-
-    return [a, b];
-}
-
-var result = foo(array);
 
       svg.append('g')
       .attr('class', 'zips')
@@ -290,12 +283,7 @@ var result = foo(array);
         .attr('r',function(d)
         {
           return 0;
-          // return 1 +d.totals/1.5;
         })
-        // .attr('r',function(d){
-        //   return 1.8+result[1][result[0].indexOf(d.Longitude.toString().substring(0,7)+d.Latitude.toString().substring(0,7)+d.race)]/4;
-        // })
-        // .style('opacity',0)
         .attr('transform', function(d){
           return 'translate('+ projection([
             d.Longitude,
@@ -330,138 +318,132 @@ var result = foo(array);
           //   });
 
             var color_key = d3.select(".keys")
-            var rect = svg.selectAll('rect')
-            .data(colors)
-            .enter()
-            .append('rect')
-            .attr('y',function(d,i){return 255 + i*30 + "px"})
-            .attr('x','400px')
-            .attr('fill', function(d){return d})
-            .attr('width','25px')
-            .attr('height','25px')
 
-            svg.selectAll(".text_keys")
-            .data(races)
-            .enter().append('text')
-            .attr('y',function(d,i){return 280 + (i*30) +'px'})
-            .attr('x','430px')
-            .text(function(d){ return d})
-            .attr('class', 'first_dataset')
-            .style('font-size','12px')
-            ;
+            function update_text(data){
 
-            d3.csv("stop_and_frisk_race.csv", function(error, data) {
-              data.forEach(function(d) {
-                d.Stops = +d.Stops;
-                d.Population = +d.Population;
-              });
 
-              var total_stops = d3.sum(data,function(d){return +d.Stops});
-              var total_pop = d3.sum(data,function(d){return +d.Population});
+              var text_keys = svg.selectAll('.text_keys')
+              .data(data)
 
-              var g = svg.append('g')
-              .attr("transform", "translate(" + width / 5.5 + "," + height / 4.5 + ")")
-              .selectAll(".arc")
-                  .data(pie(data))
-                .enter().append("g")
+              text_keys.enter().append('text')
+              .attr('y',function(d,i){return 280 + (i*30) +'px'})
+              .attr('x','430px')
+              // .text(function(d){ return parseFloat(value(d)).toFixed(0); })
+              .attr('class', 'first_dataset')
+              .style('font-size','12px')
 
-              g.append("path")
-                  .attr("d", arc)
-                  .style("fill", function(d) { return color(d.data.Race); });
+              text_keys
+              .text(function(d){ if(isNaN(parseFloat(value(d)).toFixed(0))) {return d} else {return parseFloat(value(d)).toFixed(0) };})
+              text_keys.exit().remove()
 
-              g.append("text")
-                  .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-                  .attr("dy", ".35em")
-                  .style("text-anchor", "middle")
-                  .text(function(d) { if(d.data.Stops/total_stops >.05) return (d3.round(d.data.Stops/ total_stops,2)*100).toString().substring(0,3) })
-                  .style('font-family','Calibri')
-                  .style('fill','white')
+            }
 
-              svg.append('text')
-                .attr('y','360px')
-                .attr('x','270px')
-                .html("% of Stops by Race")
-                .style('text-anchor','middle')
-                .style('font-family','Calibri')
-                .style('font-size','12px');
+            function update(data){
+              var rect = svg.selectAll('rect')
+              .data(data)
+              rect.enter().append('rect')
+              .attr('fill', function(d){return d}).style('opacity',1)
+              .attr('y',function(d,i){return 255 + i*30 + "px"})
+              .attr('x','400px')
+              .attr('width','25px')
+              .attr('height','25px')
 
-                svg.append('text')
-                  .attr('y','240px')
-                  .attr('x','270px')
-                  .html("% of NYC population by Race")
-                  .style('text-anchor','middle')
-                  .style('font-family','Calibri')
-                  .style('font-size','12px');
+              rect
+              .attr('fill', function(d){return d}).style('opacity',1);
 
-                var g2 = svg.append('g')
-                .attr("transform", "translate(" + width / 5.5 + "," + height / 4.5 + ")")
-                  .selectAll('.arc2')
-                  .data(pie2(data))
-                  .enter().append('g')
-                  .attr('class','zips');
+              rect.exit().remove();
+            };
 
-              g2.append('path')
-              .attr('d',arc2)
-              .style('fill',function(d){return color(d.data.Race);})
+            update(colors_zips);
+            update_text(colors_zips);
 
-              g2.append("text")
-                  .attr("transform", function(d) { return "translate(" + arc2.centroid(d) + ")"; })
-                  .attr("dy", ".35em")
-                  .style("text-anchor", "middle")
-                  .text(function(d){if(d.data.Population/total_pop > .03) return (d3.round(d.data.Population/ total_pop,2)*100).toString().substring(0,2)})
-                  .style('font-family','Calibri')
-                  .style('fill','white');
 
-              d3.select("#toggle")
+              d3.select(".toggle-group")
               .on("click",function()
               {
+
+                d3.selectAll(".first_dataset").style('display','none');
+                update(colors);
+                update_text(races);
+
                 var dots = document.querySelectorAll('circle')
 
                 for(i=0;i<dots.length;i++)
                 {
                   d3.select(dots[i])
-                  .transition()
-                  .duration(i)    
                   .style('opacity',1)
+                  .transition()
+                  .duration(i)
                   .attr('r',function(d){return d.totals;});
                 };
 
-
                 d3.selectAll('.zippy')
                 .transition()
-                .duration(7000)
+                .duration(5000)
                 .style('fill','lightgrey')
 
 
+                d3.csv("stop_and_frisk_race.csv", function(error, data) {
+                  data.forEach(function(d) {
+                    d.Stops = +d.Stops;
+                    d.Population = +d.Population;
+                  });
 
-                //   d3.selectAll('circle')
-                //   .transition()
-                //   .duration(1000)
-                // .style('opacity',1);
-                //
-                // setTimeout(function(){
-                //   d3.selectAll('.W')
-                // .transition()
-                // .duration(1000)
-                // .style('opacity',1)},2000);
-                //
-                // setTimeout(function(){
-                //   d3.selectAll('.P')
-                //   .transition()
-                //   .duration(1000)
-                //   .style('opacity',1)},2500)
-                //
-                // setTimeout(function(){
-                //   d3.selectAll('.Q')
-                //   .transition()
-                //   .duration(1000)
-                //   .style('opacity',1)},2500)
-                //
-                // setTimeout(function(){
-                //   d3.selectAll('.B')
-                //   .transition()
-                //   .duration(1000)
-                //   .style('opacity',1)},3000)
+                  var total_stops = d3.sum(data,function(d){return +d.Stops});
+                  var total_pop = d3.sum(data,function(d){return +d.Population});
+
+                  var g = svg.append('g')
+                  .attr("transform", "translate(" + width / 5.5 + "," + height / 4.5 + ")")
+                  .selectAll(".arc")
+                      .data(pie(data))
+                    .enter().append("g")
+
+                  g.append("path")
+                      .attr("d", arc)
+                      .style("fill", function(d) { return color(d.data.Race); });
+
+                  g.append("text")
+                      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+                      .attr("dy", ".35em")
+                      .style("text-anchor", "middle")
+                      .text(function(d) { if(d.data.Stops/total_stops >.05) return (d3.round(d.data.Stops/ total_stops,2)*100).toString().substring(0,3) })
+                      .style('font-family','Calibri')
+                      .style('fill','white')
+
+                  svg.append('text')
+                    .attr('y','360px')
+                    .attr('x','270px')
+                    .html("% of Stops by Race")
+                    .style('text-anchor','middle')
+                    .style('font-family','Calibri')
+                    .style('font-size','12px');
+
+                    svg.append('text')
+                      .attr('y','240px')
+                      .attr('x','270px')
+                      .html("% of NYC population by Race")
+                      .style('text-anchor','middle')
+                      .style('font-family','Calibri')
+                      .style('font-size','12px');
+
+                    var g2 = svg.append('g')
+                    .attr("transform", "translate(" + width / 5.5 + "," + height / 4.5 + ")")
+                      .selectAll('.arc2')
+                      .data(pie2(data))
+                      .enter().append('g')
+                      .attr('class','zips');
+
+                  g2.append('path')
+                  .attr('d',arc2)
+                  .style('fill',function(d){return color(d.data.Race);})
+
+                  g2.append("text")
+                      .attr("transform", function(d) { return "translate(" + arc2.centroid(d) + ")"; })
+                      .attr("dy", ".35em")
+                      .style("text-anchor", "middle")
+                      .text(function(d){if(d.data.Population/total_pop > .03) return (d3.round(d.data.Population/ total_pop,2)*100).toString().substring(0,2)})
+                      .style('font-family','Calibri')
+                      .style('fill','white');
 
               })
 
@@ -470,4 +452,5 @@ var result = foo(array);
 
   };
   </script>
+
 </body>
