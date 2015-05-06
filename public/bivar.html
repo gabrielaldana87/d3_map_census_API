@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,7 +133,9 @@ li:hover{
   display:none;
 }
 
-
+.dot:hover{
+  cursor: pointer;
+}
 
 </style>
 </head>
@@ -159,18 +162,16 @@ var button = document.createElement('button');
 input_div.appendChild(button);
 button.innerText='Submit';
 
-
-button.onclick = function()
-{
+// button.onclick = function()
+// {
   var xhr = new XMLHttpRequest();
-  // xhr.open("GET","/bivariate/DP03_0062E/DP03_0009PE");
-  xhr.open("GET","/bivariate/"+input_first.value+"/"+input_second.value);
+  xhr.open("GET","/bivariate/DP03_0062E/DP02_0067PE");
+  // xhr.open("GET","/bivariate/"+input_first.value+"/"+input_second.value);
 
   xhr.addEventListener("load",function(e)
     {
       var d = xhr.responseText;
       window.parsed = JSON.parse(d);
-
 
       var leftdiv = document.createElement("div");
       leftdiv.id="leftdiv";
@@ -184,8 +185,8 @@ button.onclick = function()
 
       var margin = {top: 50, right: 100, bottom: 30, left: 55},
           // width = 1060 - margin.left - margin.right,
-          width = 700 - margin.left - margin.right,
-          height = 550 - margin.top - margin.bottom;
+          width = 1500 - margin.left - margin.right,
+          height = 750 - margin.top - margin.bottom;
 
       var x = d3.scale.linear()
           .range([0, width]);
@@ -206,7 +207,18 @@ button.onclick = function()
       var zoom = d3.behavior.zoom()
       .x(x)
       .y(y)
-      .scaleExtent([1, 32])
+      .scaleExtent([1, 32]);
+
+      var tooltip = d3.select('#rightdiv').append('div')
+      .style('position', 'absolute')
+      .style('padding', '0 10px')
+      .style('background', "rgba(0,153,76,.8)")
+      .style('font-size',"11px")
+      .style('font-family',"Calibri")
+      .style('color','white')
+      .style('width','100px')
+      .style('text-align','center')
+      .attr('class', 'selected_tooltip tooltip_divs')
 
       var svg = d3.select("#leftdiv").append("svg")
           .attr("width", width + margin.left + margin.right)
@@ -224,7 +236,7 @@ button.onclick = function()
 
       queue()
       .defer(d3.json, "./us_counties_fips.json")
-      .defer(d3.json, "./bivariate.json") //Housing Value
+      .defer(d3.json, "./bivariate.json") //Household Income against Educational Attainment
       .defer(d3.json, "./states_regions.json")
       .await(ready);
 
@@ -250,14 +262,15 @@ button.onclick = function()
             var d = xhr2.responseText;
             var parsed = JSON.parse(d);
 
-            var filtered = _.filter(parsed,function(o){return o.c_id===input_first.value});
-            var filtered2 = _.filter(parsed,function(o){return o.c_id===input_second.value});
-            console.log(filtered);
+            var filtered = _.filter(parsed,function(o){return o.c_id==='DP03_0062E'});
+            var filtered2 = _.filter(parsed,function(o){return o.c_id==='DP02_0067PE'});
 
-        svg.append("g")
+var gAxis = svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis)
+
+          gAxis
           .append("text")
             .attr("class", "label")
             .attr("x", width)
@@ -265,9 +278,11 @@ button.onclick = function()
             .style("text-anchor", "end")
             .text(filtered[0].indicator1+" : "+filtered[0].indicator2)
 
-        svg.append("g")
+var gyAxis=  svg.append("g")
             .attr("class", "y axis")
             .call(yAxis)
+
+          gyAxis
           .append("text")
             .attr("class", "label")
             .attr("transform", "rotate(-90)")
@@ -280,7 +295,7 @@ button.onclick = function()
             .data(data)
           .enter().append("circle")
             .attr("class", "dot")
-            .attr("r", 2.5)
+            .attr("r", 3.5)
             .attr("cx", function(d) { return x(d.rate_one); })
             .attr("cy", function(d) { return y(d.rate_two); })
             .attr("class", function(d)
@@ -328,11 +343,109 @@ button.onclick = function()
                                 .attr('stroke-width',2.5)
                                 .attr('stroke','black')
                                 .attr('opacity',.2);
+
+              d3.select(this).attr('r',8)
+
             })
             .on('mouseout',function(d)
             {
               d3.selectAll('.crosshair')
-              .style('display','none')
+              .style('display','none');
+            })
+            .on('click',function(d)
+            {
+              var this_dot = d3.select(this);
+              this_dot
+              .attr('r',3.5)
+              .classed('dot',false);
+
+              var state_que = d.id.substring(0,2);
+              var cnty_que = d.id.substring(2,5);
+
+              var xhr = new XMLHttpRequest();
+              xhr.open("GET","/bivariate/zips/"+state_que+"/"+cnty_que);
+
+              xhr.addEventListener("load",function(e)
+                {
+                  var d = xhr.responseText;
+                  var parsed = JSON.parse(d);
+
+                  d3.selectAll('.dot')
+                  .transition()
+                  .duration(1000)
+                  .attr('cy',height)
+                  .style('opacity',0)
+
+                  // xAxis = d3.svg.axis()
+                  //     .scale(x)
+                  //     .orient("bottom");
+
+                  transition();
+
+                  function transition()
+                  {
+                    gAxis.transition().duration(2000).tween('axis',function(d,i)
+                  {
+                    var i = d3.interpolate(d3.extent(data, function(d) {return d.rate_one;}),d3.extent(parsed, function(d) { return d.inc_rate; }));
+                    return function(t)
+                    {
+                      x.domain(i(t));
+                      gAxis.call(xAxis);
+                    }
+                  });
+
+                  gyAxis.transition().duration(2000).tween('axis',function(d,i)
+                  {
+                    var i = d3.interpolate(d3.extent(data, function(d){ return d.rate_two;}),d3.extent(parsed, function(d){ return d.edu_rate; }));
+                    return function(t)
+                    {
+                      y.domain(i(t));
+                      gyAxis.call(yAxis);
+                    }
+                  });
+                  }
+
+                  x.domain(d3.extent(parsed, function(d) { return d.inc_rate; }))
+                  y.domain(d3.extent(parsed, function(d) { return d.edu_rate; }))
+                  svg.selectAll(".dot_zips")
+                      .data(parsed)
+                    .enter().append("circle")
+                      .attr("r", 3.5)
+                      .attr("cx", this_dot[0][0].cx.baseVal.value)
+                      .attr("cy", this_dot[0][0].cy.baseVal.value)
+                      .transition()
+                      .duration(2000)
+                      .attr("cx", function(d) { return x(d.inc_rate); })
+                      .attr("cy", function(d) { return y(d.edu_rate); })
+                      .attr("class", this_dot[0][0].classList[0])
+                      // .classed('dot',true)
+                      // .transition()
+                      // .duration(3000)
+                      .attr('r',function(d){return d.SUM_POPPCT/1000 })
+                      .style('stroke','white')
+                      .style('stroke-width',2);
+
+                      d3.selectAll('circle')
+                      .on('mouseover', function(d)
+                        {
+                        tooltip.html("Zip Code: "+d.ZCTA5+"<br>Household Income: "+d.inc_rate+"<br>Educational Attainment: "+d.edu_rate)
+                        .style('left', (d3.event.pageX + 350) + 'px')
+                        .style('top',  (d3.event.pageY - 30) + 'px')
+                        tempColor = this.style.fill;
+                        d3.select(this)
+                        .style('opacity', .5);
+                        })
+                      .on('mouseout', function(d)
+                        {
+                        d3.select(this)
+                        .style('opacity',1)
+                        // .style('fill',tempColor);
+                        d3.selectAll(".tooltip_divs")
+                        .attr("class", "selected3 first_dataset");
+                        })
+                        .attr("id","tooltip");
+                });
+              xhr.send();
             });
 
         var legend = svg.selectAll(".legend")
@@ -387,7 +500,6 @@ button.onclick = function()
                   .transition()
                   .duration(3000)
                   .attr('r',0)
-                  console.log(not_selected);
                   state = true;
                   };
                 })
@@ -402,9 +514,6 @@ button.onclick = function()
                   .style("opacity",1)
 
                   var not_selected = d3.selectAll(".not_selected")
-
-
-
 
                   for(i=0;i<not_selected[0].length;i++)
                   {not_selected[0][i].setAttribute("class",not_selected[0][i].classList[0]+" "+not_selected[0][i].classList[1]+" "+not_selected[0][i].classList[2]+" "+not_selected[0][i].classList[3]+" mouseover")};
@@ -497,11 +606,8 @@ button.onclick = function()
                     .transition()
                     .duration(2000)
                     .style('fill',d.color)
-                    .style("opacity",1)
-
-                    ;
+                    .style("opacity",1);
                   });
-
           });
 
           xhr2.send();
@@ -509,7 +615,7 @@ button.onclick = function()
 
     });
   xhr.send();
-};
+// };
 
 
 
