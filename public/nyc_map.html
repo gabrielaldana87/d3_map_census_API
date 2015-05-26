@@ -74,12 +74,12 @@ text{
   var rateById = d3.map();
 
   var quantize = d3.scale.quantize()
-  .domain([1,76])
+  .domain([1,90])
   .range(d3.range(10).map(function(i){return "q"+i+"-9"}))
 
   var projection = d3.geo.mercator()
-  .center([-73.6867, 40.94])
-  .scale(6000)
+  .center([-73.9667, 40.7172])
+  .scale(160000)
   .translate([(width) / 2, (height)/2]);
 
   var path = d3.geo.path()
@@ -100,8 +100,8 @@ text{
   .style('text-align','center')
 
   queue()
-  .defer(d3.json, "./topo_ny_zip.json")
-  .defer(d3.json, "./zip_rate.json")
+  .defer(d3.json, "./topo_nyc.json")
+  .defer(d3.json, "/zip_var/DP05_0033PE.json")
   .await(ready);
 
   function ready(error, us, json) {
@@ -114,7 +114,7 @@ text{
     svg.append("g")
     .attr("class", "zips")
     .selectAll("path")
-    .data(topojson.feature(us,us.objects.zips_new_york_v2).features)
+    .data(topojson.feature(us,us.objects.nyc).features)
     .enter().append("path")
     .attr("class", function(d){return quantize(rateById.get(d.id))})
 

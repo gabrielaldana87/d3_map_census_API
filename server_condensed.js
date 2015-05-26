@@ -120,15 +120,15 @@ app.get('/choropleths/CREATE/:indicator',function(req, res)
               data.forEach(function(zip)
               {
 
-                if(zip[1].substring(0,1)==='1')
-                {
+                // if(zip[1].substring(0,1)==='1')
+                // {
                   var datum =
                   {
                   id: zip[1],
                   rate: parseFloat(zip[0])
                   }
                   array2.push(datum);
-                };
+                // };
               });
 
               fs.writeFile("./public/zip_var/"+req.params.indicator+".json",JSON.stringify(array2),function(e)
@@ -186,7 +186,7 @@ app.get('/stopandfrisk/details',function(req,res)
 {
   if(req.params.indicator!=='favicon.ico')
     {
-          db2.all("select distinct Longitude, Latitude, race, count(*) as totals from data group by Longitude,Latitude,race order by Latitude desc",
+          db2.all("select distinct Longitude, Latitude, race, count(*) as totals from data group by Longitude,Latitude,race order by totals desc",
           function(err, row)
             {
             if(err) {throw err;}
@@ -213,7 +213,8 @@ app.get('/bivariate/:indicator1/:indicator2',function(req,res)
 {
   if(req.params.indicator!=='favicon.ico')
     {
-      fs.readFile("./public/"+req.params.indicator1+".json", function(e1,data1)
+      fs.readFile("./public/DP03_0062E.json", function(e1,data1) // test file for Median Household Income
+      // fs.readFile("./public/"+req.params.indicator1+".json", function(e1,data1) // put this line back when you are done testing
       {
         var bach_educat = JSON.parse(data1);
         var array = [];
@@ -227,8 +228,8 @@ app.get('/bivariate/:indicator1/:indicator2',function(req,res)
           }
            array.push(single);
         });
-
-        fs.readFile("./public/"+req.params.indicator2+".json", function(e2,data2)
+        // fs.readFile("./public/DP02_0067PE.json", function(e2,data2) // test file for % Bachelors Degree or Higher
+        fs.readFile("./public/"+req.params.indicator2+".json", function(e2,data2) // put this line back when you are done testing
         {
           var med_income = JSON.parse(data2);
 
@@ -242,7 +243,7 @@ app.get('/bivariate/:indicator1/:indicator2',function(req,res)
               };
             });
           });
-          fs.writeFile("./public/bivariate.json", JSON.stringify(array),function(e)
+          fs.writeFile("./public/DP03_0062E&"+req.params.indicator2+".json", JSON.stringify(array),function(e)
           {
             console.log("you are on your way to bivariate analysis!");
             res.json(array);
@@ -254,9 +255,25 @@ app.get('/bivariate/:indicator1/:indicator2',function(req,res)
     };
 });
 
+app.get('/bivariate/zips/:indicator1/:indicator2',function(req,res)
+{
+  if(req.params.indicator!=='favicon.ico')
+    {
+      console.log(req.params.indicator1);
+      console.log(req.params.indicator2);
 
+      db.all("SELECT A.ZCTA5, SUM(A.ZPOPPCT) AS SUM_ZPOPPCT, SUM(A.POPPT) AS SUM_POPPCT, B.RATE as inc_rate, C.RATE as edu_rate, COUNT(*) AS ZIP_SHAPES FROM zcta_cnty_rel AS A left JOIN DP03_0062E AS B ON A.ZCTA5=B.id LEFT JOIN DP02_0067PE AS C ON A.ZCTA5=C.ID WHERE A.STATE=(?)  AND A.COUNTY=(?) AND A.POPPT >0 GROUP BY A.ZCTA5,inc_rate, edu_rate ORDER BY SUM_POPPCT DESC",
+      parseInt(req.params.indicator1),
+      parseInt(req.params.indicator2),
+      function(err, row)
+        {
+        if(err) {throw err;}
+        res.json(row);
+        });
+    };
 });
-var server = app.listen(80,function()
+});
+var server = app.listen(3000,function()
 {
   console.log("listening on port 80")
 });

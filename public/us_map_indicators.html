@@ -64,9 +64,6 @@ a:hover,li:hover{
   display: none;
 
 }
-/*#rightdiv{
-  height: 100%;
-}*/
 
 .rightnav{
   width: 25%;
@@ -221,6 +218,7 @@ ul.no-js{
 div{
   display: inline-block;
 }
+
 .click-nav ul li a:hover {
   background:#F2F2F2;
 }
@@ -272,9 +270,6 @@ text.choro_box_text{
   font-size: 10px;
 }
 
-
-
-
 </style>
 <body>
   <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -319,6 +314,8 @@ text.choro_box_text{
   var nav = document.createElement("ul");
   div3.appendChild(nav);
   nav.setAttribute("class", "rightnav");
+
+
 
   var xhr1 = new XMLHttpRequest();
   xhr1.open("GET","/choropleths/variables");
@@ -587,13 +584,12 @@ d3.selectAll('.choro_box_text').style('font-size','12.5px');
                 .call(zoom.event);
 
       queue()
-      .defer(d3.json,"./states.json")
+      // .defer(d3.json,"./states.json")
       .defer(d3.json,param.c_id+".json")
       .await(ready);
 
       function ready(err,usa,json)
         {
-          console.log(usa);
         json.forEach(function(obj)
           {
           rateById.set(obj.id,+obj.rate);
@@ -607,6 +603,8 @@ d3.selectAll('.choro_box_text').style('font-size','12.5px');
         .attr("class",function(d){return quantize(rateById.get(d.id))})
         .attr("d",path)
         .style("stroke-width", ".5px")
+
+
         .on('click', function(d)
           {
           cntyselect_text.html('<strong>'+d.properties.name+" : "+rateById.get(d.id)+'</strong>'+'<br> Counties with rates <strong class="higher" color="red">HIGHER</strong> than '+d.properties.name+' County:')

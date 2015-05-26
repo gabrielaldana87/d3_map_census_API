@@ -236,7 +236,7 @@ button.innerText='Submit';
 
       queue()
       .defer(d3.json, "./us_counties_fips.json")
-      .defer(d3.json, "./bivariate.json") //Household Income against Educational Attainment
+      .defer(d3.json, "./DP03_0062E&DP02_0067PE.json") //Household Income against Educational Attainment
       .defer(d3.json, "./states_regions.json")
       .await(ready);
 
@@ -370,80 +370,88 @@ var gyAxis=  svg.append("g")
                   var d = xhr.responseText;
                   var parsed = JSON.parse(d);
 
-                  d3.selectAll('.dot')
-                  .transition()
-                  .duration(1000)
-                  .attr('cy',height)
-                  .style('opacity',0)
 
-                  // xAxis = d3.svg.axis()
-                  //     .scale(x)
-                  //     .orient("bottom");
+                  var selection = document.querySelectorAll('.dot')
 
-                  transition();
+                  console.log(selection.length);
 
-                  function transition()
+                  for(i=0;i<selection.length;i++)
                   {
-                    gAxis.transition().duration(2000).tween('axis',function(d,i)
-                  {
-                    var i = d3.interpolate(d3.extent(data, function(d) {return d.rate_one;}),d3.extent(parsed, function(d) { return d.inc_rate; }));
-                    return function(t)
-                    {
-                      x.domain(i(t));
-                      gAxis.call(xAxis);
-                    }
-                  });
+                    d3.select(selection[i])
+                    .transition()
+                    .duration(2000+i)
+                    .attr('cy',height+100)
+                    // .style('opacity',0)
+                  };
+                  // d3.selectAll('.dot')
+                  // .transition()
+                  // .duration(2000)
+                  // .attr('cy',height)
+                  // .
 
-                  gyAxis.transition().duration(2000).tween('axis',function(d,i)
-                  {
-                    var i = d3.interpolate(d3.extent(data, function(d){ return d.rate_two;}),d3.extent(parsed, function(d){ return d.edu_rate; }));
-                    return function(t)
-                    {
-                      y.domain(i(t));
-                      gyAxis.call(yAxis);
-                    }
-                  });
-                  }
+                  window.setTimeout(function transition()
+                                    {
 
-                  x.domain(d3.extent(parsed, function(d) { return d.inc_rate; }))
-                  y.domain(d3.extent(parsed, function(d) { return d.edu_rate; }))
-                  svg.selectAll(".dot_zips")
-                      .data(parsed)
-                    .enter().append("circle")
-                      .attr("r", 3.5)
-                      .attr("cx", this_dot[0][0].cx.baseVal.value)
-                      .attr("cy", this_dot[0][0].cy.baseVal.value)
-                      .transition()
-                      .duration(2000)
-                      .attr("cx", function(d) { return x(d.inc_rate); })
-                      .attr("cy", function(d) { return y(d.edu_rate); })
-                      .attr("class", this_dot[0][0].classList[0])
-                      // .classed('dot',true)
-                      // .transition()
-                      // .duration(3000)
-                      .attr('r',function(d){return d.SUM_POPPCT/1000 })
-                      .style('stroke','white')
-                      .style('stroke-width',2);
+                                      x.domain(d3.extent(parsed, function(d) { return d.inc_rate; }))
+                                      y.domain(d3.extent(parsed, function(d) { return d.edu_rate; }))
+                                      svg.selectAll(".dot_zips")
+                                          .data(parsed)
+                                        .enter().append("circle")
+                                          .attr("r", 3.5)
+                                          .attr("cx", this_dot[0][0].cx.baseVal.value)
+                                          .attr("cy", this_dot[0][0].cy.baseVal.value)
+                                          .transition()
+                                          .duration(8000)
+                                          .style("opacity",.6)
+                                          .attr("cx", function(d) { return x(d.inc_rate); })
+                                          .attr("cy", function(d) { return y(d.edu_rate); })
+                                          .attr("class", this_dot[0][0].classList[0])
+                                          // .classed('dot',true)
+                                          // .transition()
+                                          // .duration(3000)
+                                          .attr('r',function(d){return d.SUM_POPPCT/1000 })
+                                          .style('stroke','white')
+                                          .style('stroke-width',2);
 
-                      d3.selectAll('circle')
-                      .on('mouseover', function(d)
-                        {
-                        tooltip.html("Zip Code: "+d.ZCTA5+"<br>Household Income: "+d.inc_rate+"<br>Educational Attainment: "+d.edu_rate)
-                        .style('left', (d3.event.pageX + 350) + 'px')
-                        .style('top',  (d3.event.pageY - 30) + 'px')
-                        tempColor = this.style.fill;
-                        d3.select(this)
-                        .style('opacity', .5);
-                        })
-                      .on('mouseout', function(d)
-                        {
-                        d3.select(this)
-                        .style('opacity',1)
-                        // .style('fill',tempColor);
-                        d3.selectAll(".tooltip_divs")
-                        .attr("class", "selected3 first_dataset");
-                        })
-                        .attr("id","tooltip");
+                                          d3.selectAll('circle')
+                                          .on('mouseover', function(d)
+                                            {
+                                            tooltip.html("Zip Code: "+d.ZCTA5+"<br>Household Income: "+d.inc_rate+"<br>Educational Attainment: "+d.edu_rate)
+                                            .style('left', (d3.event.pageX + 350) + 'px')
+                                            .style('top',  (d3.event.pageY - 30) + 'px')
+                                            tempColor = this.style.fill;
+                                            d3.select(this)
+                                            .style('opacity', 1);
+                                            })
+                                          .on('mouseout', function(d)
+                                            {
+                                            d3.select(this)
+                                            .style('opacity',.6)
+                                            // .style('fill',tempColor);
+                                            d3.selectAll(".tooltip_divs")
+                                            .attr("class", "selected3 first_dataset");
+                                            })
+                                            .attr("id","tooltip");
+                                      gAxis.transition().duration(8000).tween('axis',function(d,i)
+                                    {
+                                      var i = d3.interpolate(d3.extent(data, function(d) {return d.rate_one;}),d3.extent(parsed, function(d) { return d.inc_rate; }));
+                                      return function(t)
+                                      {
+                                        x.domain(i(t));
+                                        gAxis.call(xAxis);
+                                      }
+                                    });
+
+                                    gyAxis.transition().duration(8000).tween('axis',function(d,i)
+                                    {
+                                      var i = d3.interpolate(d3.extent(data, function(d){ return d.rate_two;}),d3.extent(parsed, function(d){ return d.edu_rate; }));
+                                      return function(t)
+                                      {
+                                        y.domain(i(t));
+                                        gyAxis.call(yAxis);
+                                      }
+                                    });
+                                  },1220);
                 });
               xhr.send();
             });

@@ -8,7 +8,7 @@
 <style>
 
 path{
-  stroke-width:.5;
+  /*stroke-width:.5;*/
   stroke-linejoin:round;
   /*stroke:white;*/
   fill:lightgrey;
@@ -18,9 +18,9 @@ path:hover{
   stroke-width:1;
 }
 
-div{
+/*div{
   width: 200px;
-}
+}*/
 
 svg{
   background-color:white;
@@ -43,8 +43,10 @@ text{
 }
 
 .div_leftcorner{
-  margin-left:60px;
+
   margin-top:60px;
+  margin-bottom:20px;
+  margin-left:20px;
 }
 
 
@@ -57,6 +59,7 @@ button{
   position: absolute;
   top: 70px;
 }
+
 .A { fill: #663398;}
 .B { fill: steelblue; }
 .I { fill:  grey; }
@@ -66,6 +69,10 @@ button{
 .X { fill: #F6AB36; }
 .U { fill: #F6AB36; }
 .Z { fill: purple ; }
+
+.container{
+  position: fixed;
+}
 
 #tooltip{
   position: absolute;
@@ -93,6 +100,35 @@ button{
 .q5-9 { fill:#FF180E; }
 .q6-9 { fill:#BF0A00; }
 
+.tr_head{
+  height: 50px;
+}
+
+.body-parent{
+  font-size: 12px;
+}
+
+.panel{
+  border-radius:0px;
+}
+
+.table>tbody>tr>td{
+  padding: 5px;
+  background-color: #ECECEC;
+  text-align: center;
+}
+
+th{
+  text-align: center;
+}
+
+.scroll_div{
+  border-top: 1px solid #ddd;
+  overflow-y: scroll;
+  height: 283px;
+}
+
+
 
 </style>
 <body>
@@ -104,11 +140,13 @@ button{
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
   <script src="./bootstrap-toggle-master/js/bootstrap-toggle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore.js"></script>
 
   <script>
 
   var body = document.querySelector('body');
   var input = document.createElement('input');
+  body.setAttribute('class','body-parent');
 
   var div = document.createElement('div');
   body.appendChild(div);
@@ -120,6 +158,88 @@ button{
   input.setAttribute('data-off','Race & Incidents');
   input.setAttribute('data-on','Zipcodes & Incidents');
   div.appendChild(input);
+
+  var container = document.createElement('div');
+  body.appendChild(container);
+  container.setAttribute('class','col-md-4 container');
+
+  var div_table = document.createElement('div');
+  container.appendChild(div_table);
+  div_table.setAttribute("class","panel panel-success");
+
+  var div_panel_heading = document.createElement('div');
+  div_table.appendChild(div_panel_heading);
+  div_panel_heading.setAttribute('class','panel-heading');
+
+  var header_3 = document.createElement('h3');
+  div_panel_heading.appendChild(header_3);
+  header_3.setAttribute('class','panel-title');
+  header_3.innerText="Social and Demographic Indicators for Top 20 Stop and Frisk Zipcodes";
+
+  var panel_body = document.createElement('div');
+  div_table.appendChild(panel_body);
+  panel_body.setAttribute('class','panel-body');
+
+  var p_table_desc = document.createElement('p');
+  panel_body.appendChild(p_table_desc);
+  p_table_desc.innerText="The top 20 zipcodes ranked by number of Stop and Frisk incidents represent 16% of the total population of NYC, yet cover 35% of all Stop and Frisk incidents (15,399 out of 44,137).\n In terms of racial and ethnic makeup; this area is overall 32% Hispanic and 49% Black. The surveillance of these primarily Black neighborhoods by the NYPD encompasses almost 1 out of 3 of all Blacks (31% of all people in NYC who identify as Black/African American). See these neighborhoods below."
+
+  var scroll_div = document.createElement('div');
+  div_table.appendChild(scroll_div);
+  scroll_div.setAttribute('class','scroll_div');
+
+  var table = document.createElement('table');
+  scroll_div.appendChild(table);
+  table.setAttribute('class','table');
+
+  var thead = document.createElement('thead');
+  table.appendChild(thead);
+  var tr = document.createElement('tr');
+  tr.setAttribute('class','tr_head')
+  thead.appendChild(tr);
+
+  var th_array = ["Zipcode","Zipcode Population","% Black Population","% Hispanic Population","% in Poverty"];
+
+  for (i=0;i<th_array.length;i++)
+  {
+    var th = document.createElement('th');
+    tr.appendChild(th);
+    th.innerText=th_array[i];
+  }
+
+
+  var tbody = document.createElement('tbody');
+  table.appendChild(tbody);
+
+  d3.csv("zips_stop_frisk_top20.csv", function(error, data)
+    {
+      for(i=0;i<data.length;i++)
+      {
+        var tr = document.createElement('tr');
+        tbody.appendChild(tr);
+          var td1 = document.createElement('th');
+          tr.appendChild(td1);
+          td1.innerText=data[i].zipcode;
+          td1.setAttribute('class','theader');
+          td1.setAttribute('id','Z'+data[i].zipcode);
+
+          var td2 = document.createElement('td');
+          tr.appendChild(td2);
+          td2.innerText=d3.format(",")(data[i].POPZIP);
+
+          var td3 = document.createElement('td');
+          tr.appendChild(td3);
+          td3.innerText=data[i].BLACK;
+
+          var td4 = document.createElement('td');
+          tr.appendChild(td4);
+          td4.innerText=data[i].HISP;
+
+          var td5 = document.createElement('td');
+          tr.appendChild(td5);
+          td5.innerText=data[i].POVER;
+      };
+    });
 
 
   // div.id='toggle';
@@ -265,7 +385,29 @@ button{
       .style('opacity',1)
       .style('fill',tempColor)
     })
-    .attr("id","tooltip");
+    .attr("id",function(d){
+      return "Z"+d.id;
+    });
+
+    d3.selectAll(".theader")
+    .on('mouseover',function()
+    {
+      var selection = d3.select(this);
+
+       d3.selectAll("#"+selection[0][0].id)
+      .style('color','red')
+      .attr('stroke','black')
+      .attr('stroke-width',2);
+    })
+    .on('mouseout',function()
+    {
+      var selection = d3.select(this);
+
+       d3.selectAll("#"+selection[0][0].id)
+      .style('color','black')
+      .attr('stroke','grey')
+      .attr('stroke-width',.5);
+    });
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET","/stopandfrisk/details");
@@ -369,12 +511,19 @@ button{
                 var dots = document.querySelectorAll('circle')
 
                 for(i=0;i<dots.length;i++)
+                // for(i=dots.length;i>0;i--)
                 {
+
                   d3.select(dots[i])
                   .style('opacity',1)
+                  .attr('r',1.5)
                   .transition()
                   .duration(i)
-                  .attr('r',function(d){return d.totals;});
+                  .transition()
+                  .delay(1000+i*10)
+                  .duration(1000)
+                  .attr('r',function(d){return d.totals});
+
                 };
 
                 d3.selectAll('.zippy')
@@ -448,6 +597,11 @@ button{
               })
 
             });
+
+
+
+
+
     });
 
   };

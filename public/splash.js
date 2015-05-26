@@ -6,7 +6,7 @@ bivar.addEventListener("click",function()
     .text("Bivariate Analysis")
 
     var each_div  = d3.selectAll(".thumbnail");
-    console.log(each_div);
+
 
     var xhr2 = new XMLHttpRequest();
     xhr2.open("GET","/choropleths/variables");
@@ -23,17 +23,17 @@ bivar.addEventListener("click",function()
       for(i=0;i<each_div[0].length;i++)
       {
         var filtered = _.filter(parsed, function(o){return o.c_id===indicators_bivar[i]});
-        console.log(filtered);
+
         each_div[0][i].childNodes[3].innerText=filtered[0].short+"\n"+filtered[0].indicator1+":\n"+filtered[0].indicator3;
         each_div[0][i].childNodes[1].outerHTML="<img src='./"+indicators_bivar[i]+".png' class='img-responsive' alt='Responsive image'>";
 
         var img = each_div[0][i].childNodes[1];
-        console.log(img);
+
         img.setAttribute("id",indicators_bivar[i]);
       };
 
       var image = d3.selectAll('img');
-      console.log(image);
+
 
       image
       .on("click",function()
@@ -55,7 +55,6 @@ bivar.addEventListener("click",function()
           {
             var d = xhr.responseText;
             window.parsed = JSON.parse(d);
-
 
             var leftdiv = document.createElement("div");
             leftdiv.id="leftdiv";
@@ -120,6 +119,8 @@ bivar.addEventListener("click",function()
                 d.rate = +d.rate;
               });
 
+              console.log(data)
+
               var colors = ['white','#663398','#F6AB36','#26A65B','#2474A9','#F72459'];
 
               var reg_div = _.uniq(_.map(region,function(o){return o.region}));
@@ -137,8 +138,6 @@ bivar.addEventListener("click",function()
 
                   var filtered = _.filter(parsed,function(o){return o.c_id==="DP03_0062E"});
                   var filtered2 = _.filter(parsed,function(o){return o.c_id===metric_this.id});
-                  console.log(filtered);
-                  console.log(filtered2);
 
               svg.append("g")
                   .attr("class", "x axis")
@@ -179,6 +178,7 @@ bivar.addEventListener("click",function()
                       {return "dot "+region[i].region+" not_selected "+region[i].state.replace(" ","_")};
                     }
                   })
+                  .attr("id",function(d){return "fid"+d.id;})
                   .style("opacity", 0.9)
                   .on('mouseover',function(d)
                   {
@@ -276,7 +276,7 @@ bivar.addEventListener("click",function()
                         .transition()
                         .duration(3000)
                         .attr('r',0)
-                        console.log(not_selected);
+
                         state = true;
                         };
                       })

@@ -30,14 +30,14 @@
 <script src="http://d3js.org/topojson.v1.min.js"></script>
 <script>
 
-var container = document.getElementById('container');
-var input_div = document.createElement('div');
-container.appendChild(input_div);
-
-var input_first = document.createElement('input');
-var input_second = document.createElement('input');
-
-input_div.appendChild(input_first);
+// var container = document.getElementById('container');
+// var input_div = document.createElement('div');
+// container.appendChild(input_div);
+//
+// var input_first = document.createElement('input');
+// var input_second = document.createElement('input');
+//
+// input_div.appendChild(input_first);
 
 
 var width = 1000,
@@ -83,11 +83,39 @@ d3.json("./states.json", function(error, us) {
       .attr("class", "feature")
       // .on("click", clicked);
 
-  g.append("path")
+      g.append("path")
       .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
       .attr("class", "mesh")
       .attr("d", path);
 });
+
+d3.csv("./stadiums.csv",function(error,stadium){
+
+  console.log(stadium);
+
+  stadium.forEach(function(d)
+  {
+    d.VenueLatitude = +d.VenueLatitude;
+    d.VenueLongitude= +d.VenueLongitude;
+
+  });
+
+  svg.append('g')
+  // .attr('class', 'stadiums')
+  .selectAll('.dot')
+    .data(stadium)
+    .enter().append('circle')
+    .attr('r',5)
+    .attr('transform', function(d){
+      return 'translate('+ projection([
+        d.VenueLongitude,
+        d.VenueLatitude
+      ])+')'
+    })
+
+});
+
+
 
 // function clicked(d) {
 //   if (active.node() === this) return reset();
