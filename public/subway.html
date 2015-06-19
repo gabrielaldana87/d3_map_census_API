@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" href="./bootstrap-toggle-master/css/bootstrap-toggle.css"
+</head>
+<style>
+
+path{
+  /*stroke-width:.5;*/
+  stroke-linejoin:round;
+  stroke:red;
+  fill: rgba(255,255,255,0);
+}
+path:hover{
+  stroke:red;
+  stroke-width:1;
+}
+
+.line1  {stroke: #EE352E;}
+.line2  {stroke: #EE352E;}
+.line3  {stroke: #EE352E;}
+.line4  {stroke: #00933C;}
+.line5  {stroke: #00933C;}
+.line6  {stroke: #00933C;}
+.lineB  {stroke: #FF6319;}
+.lineD  {stroke: #FF6319;}
+.lineF  {stroke: #FF6319;}
+.lineM  {stroke: #FF6319;}
+.lineA  {stroke: #2850AD;}
+.lineC  {stroke: #2850AD;}
+.lineE  {stroke: #2850AD;}
+.lineG  {stroke: #6CBE45;}
+.lineJ  {stroke: #996633;}
+.lineZ  {stroke: #996633;}
+.lineL  {stroke: #A7A9AC;}
+.lineN  {stroke: #FCCC0A;}
+.lineQ  {stroke: #FCCC0A;}
+.lineR  {stroke: #FCCC0A;}
+.lineS  {stroke: #808183;}
+.line7  {stroke: purple;}
+
+svg{
+  background-color:white;
+}
+.place-label {
+  fill: #444;
+}
+
+text{
+  font-family: "Calibri" Helvetica Arial, sans-serif;
+  font-size: 10px;
+}
+
+.subunit-label{
+  fill: #777;
+  fill-opacity: .5;
+  font-size:20px;
+  font-weight:300;
+  text-anchor:middle;
+}
+
+.div_leftcorner{
+
+  margin-top:60px;
+  margin-bottom:20px;
+  margin-left:20px;
+}
+
+.A { fill: #663398;}
+.B { fill: steelblue; }
+.I { fill:  grey; }
+.P { fill: #F72459; }
+.Q { fill: #F72459; }
+.W { fill: #26A65B; }
+.X { fill: #F6AB36; }
+.U { fill: #F6AB36; }
+.Z { fill: purple ; }
+
+.container{
+  position: fixed;
+}
+
+#tooltip{
+  position: absolute;
+  z-index: 2;
+  background: rgba(0,153,76,.8);
+  width: 130px;
+  height: 20px;
+  color: white;
+  font-size: 14px;
+  padding: 5px;
+  top: -150px;
+  left: -150px;
+  font-family: "Calibri";
+}
+
+
+
+
+
+</style>
+<body>
+
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/queue.v1.min.js"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  <script src="./bootstrap-toggle-master/js/bootstrap-toggle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore.js"></script>
+
+  <script>
+
+  var body = document.querySelector('body');
+  var input = document.createElement('input');
+  body.setAttribute('class','body-parent');
+
+
+
+  // div.id='toggle';
+  // body.appendChild(input);
+  // input.placeholder = "concept";
+  // var button = document.createElement('button');
+  // body.appendChild(button);
+  // button.innerText='Submit';
+
+  var width = 1500,
+      height = 1600,
+      radius = Math.min(width, height) / 6;
+
+
+
+  var projection = d3.geo.mercator()
+  .center([-73.9667, 40.7172])
+  .scale(160000)
+  .translate([(width) / 2, (height)/2]);
+
+
+  function zoomTo(d, scale) {
+  var point = d3.geo.mercator()
+  .translate([0,0])
+  .scale(120000)(d.Longitude,d.Latitude);
+  return zoom
+      .translate([width / 2 - point[0] * scale, height / 2 - point[1] * scale])
+      .scale(scale);
+};
+
+  function zoomed() {
+    var g = d3.selectAll('g');
+    g.style("stroke-width", 1.5 / d3.event.scale + "px");
+    g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
+
+  };
+
+  var zoom = d3.behavior.zoom()
+    .translate([0, 0])
+    .scale(1)
+    .scaleExtent([1, 8])
+    .on("zoom", zoomed);
+
+  var path = d3.geo.path()
+  .projection(projection);
+
+  var svg = d3.select("body").append("svg")
+  .attr("width", width)
+  .attr("height", height);
+
+
+  var featureGroup = svg.append('g').attr('class','feature-group');
+
+  var keys = d3.select('#leftdiv').append('div').attr('class','keys');
+
+  var tooltip = d3.select('body').append('div')
+  .style('position', 'absolute')
+  .style('padding', '0 10px')
+  .style('background', "rgba(0,153,76,.8)")
+  .style('font-size',"11px")
+  .style('font-family',"Calibri")
+  .style('color','white')
+  .style('width','100px')
+  .style('text-align','center')
+
+  queue()
+  .defer(d3.json, "./topo_nyc.json")
+  .defer(d3.json,"./routes2.json")
+  .await(ready);
+
+  svg
+              // .call(zoom) // delete this line to disable free zooming
+              .call(zoom.event);
+
+  function ready(error, us, routes) {
+
+      var lines = topojson.feature(routes,routes.objects.subway).features;
+
+      var array = [];
+
+      var object =
+      {
+        arrayset : [],
+        id: []
+      }
+
+      for (i=0;i<lines.length;i++)
+      {
+        if(lines[i].geometry.type==="MultiLineString")
+        {
+
+          lines[i].geometry.coordinates.forEach(function(each)
+          {
+            object.id.push(lines[i].properties.route_id);
+            object.arrayset.push(each);
+          });
+        }
+        else
+        {
+          object.id.push(lines[i].properties.route_id);
+          array.push(lines[i].geometry.coordinates);
+        };
+
+      };
+      console.log(object);
+      // var linetest = d3.svg.line()
+      //               .x(function (d) { return d[0]; })
+      //               .y(function (d) { return d[1]; })
+      //               .interpolate("basis");
+
+
+      featureGroup.selectAll('.route')
+            .data(topojson.feature(routes,routes.objects.subway).features)
+            .enter()
+            .append('path')
+            .attr('class', function(d){ return "line"+(d.id)})
+            .attr('d', function(d,i)
+            {
+
+              var array = [];
+
+                if(d.geometry.type==="LineString")
+                {
+                    array.push(d.geometry.coordinates);
+                }
+                if(d.geometry.type==="MultiLineString")
+                {
+                  d.geometry.coordinates.forEach(function(each)
+                  {
+                  array.push(each);
+                  });
+                };
+
+                return path(
+                {
+                    type: "MultiLineString",
+                    coordinates: array
+                });
+
+
+            })
+            // .attr("transform", function(d){ return "translate(" + projection(d.geometry.coordinates) + ")"})
+            // .attr("x", function(d){ return d.geometry.coordinates[0] > -1? 6: -6;})
+          // .attr("d",path(
+          //     {
+          //       type: "MultiLineString",
+          //       coordinates: object.arrayset
+          //     })
+          // )
+          //  .style('stroke', 'red')
+           .style('stroke-opacity', .3)
+           .style('stroke-width', 5);
+
+    // .append("g")
+    // .attr("class", "zips")
+    // .selectAll("path")
+    // .data(topojson.feature(us,us.objects.nyc).features)
+    // .enter().append("path")
+    // // .attr("class", function(d){return quantize(rateById.get(d.id))})
+    // // .attr("class", function(d){return 'Z'+d.id;})
+    // .attr("d", path)
+    // .classed("zippy",true)
+    // .on('click',function(d)
+    // {
+    //   var rateclick = rateById.get(d.id);
+    //   var paths = d3.select('path')
+    //   var pathclick = d3.selectAll('path');
+    //   // pathclick.attr("class",function(d){ if (rateById.get(d.id) >= rateclick){ return quantize(rateById.get(d.id))}})
+    // });
+
+
+
+
+
+  };
+  </script>
+
+</body>
