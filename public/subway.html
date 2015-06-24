@@ -124,26 +124,14 @@ text{
   var input = document.createElement('input');
   body.setAttribute('class','body-parent');
 
-
-
-  // div.id='toggle';
-  // body.appendChild(input);
-  // input.placeholder = "concept";
-  // var button = document.createElement('button');
-  // body.appendChild(button);
-  // button.innerText='Submit';
-
   var width = 1500,
       height = 1600,
       radius = Math.min(width, height) / 6;
-
-
 
   var projection = d3.geo.mercator()
   .center([-73.9667, 40.7172])
   .scale(160000)
   .translate([(width) / 2, (height)/2]);
-
 
   function zoomTo(d, scale) {
   var point = d3.geo.mercator()
@@ -197,7 +185,7 @@ text{
   .await(ready);
 
   svg
-              // .call(zoom) // delete this line to disable free zooming
+              .call(zoom) // delete this line to disable free zooming
               .call(zoom.event);
 
   function ready(error, us, routes) {
@@ -211,33 +199,6 @@ text{
 
       var lines = topojson.feature(routes,routes.objects.subway).features;
 
-      var array = [];
-
-      var object =
-      {
-        arrayset : [],
-        id: []
-      }
-
-      for (i=0;i<lines.length;i++)
-      {
-        if(lines[i].geometry.type==="MultiLineString")
-        {
-
-          lines[i].geometry.coordinates.forEach(function(each)
-          {
-            object.id.push(lines[i].properties.route_id);
-            object.arrayset.push(each);
-          });
-        }
-        else
-        {
-          object.id.push(lines[i].properties.route_id);
-          array.push(lines[i].geometry.coordinates);
-        };
-
-      };
-      console.log(object);
       // var linetest = d3.svg.line()
       //               .x(function (d) { return d[0]; })
       //               .y(function (d) { return d[1]; })
@@ -257,7 +218,7 @@ console.log(topojson.feature(routes,routes.objects.subway).features);
 
                 if(d.geometry.type==="LineString")
                 {
-                    // array.push(d.geometry.coordinates);
+                    array.push(d.geometry.coordinates);
                 }
                 if(d.geometry.type==="MultiLineString")
                 {
@@ -280,7 +241,7 @@ console.log(topojson.feature(routes,routes.objects.subway).features);
 
            });
 
-          //  console.log(topojson.feature(routes,routes.objects.subway).features[1].geometry.coordinates)
+      //  console.log(topojson.feature(routes,routes.objects.subway).features[1].geometry.coordinates)
 
 var circle = svg.selectAll(".point")
            .data([1])
@@ -288,13 +249,11 @@ var circle = svg.selectAll(".point")
            .attr("r",5)
            .attr("cx",616.9774511869764)
            .attr("cy",852.8658360008121)
-          //  .attr("transform", function(d,i) {return "translate(" + projection(d[i]) +")"})
+        //  .attr("transform", function(d,i) {return "translate(" + projection(d[i]) +")"})
            .style("fill","crimson")
            .style("opacity",.5);
 
-
 transition();
-
 
     function transition()
       {
@@ -306,53 +265,19 @@ transition();
       }
 
       function translateAlong(routePath) {
-  var l = routePath.getTotalLength();
+
+        var l = routePath.getTotalLength();
 
   return function(d, i, a) {
     // console.log(i)
     return function(t) {
       var p = routePath.getPointAtLength(t * l);
       var addy = (p.y)-852.8658360008121;
-      var addx = (p.x)-616.9774511869764
-
-
+      var addx = (p.x)-616.9774511869764;
       return "translate(" + addx + "," + addy + ")";
     };
   };
 }
-
-
-
-
-
-            //  .attr("transform", function(d,i) {
-            //   //  console.log(projection(d[i]))
-            //    return "translate(" +projection(d) +")"
-            //    })
-            //  .each("end", transition)
-
-
-
-    // .append("g")
-    // .attr("class", "zips")
-    // .selectAll("path")
-    // .data(topojson.feature(us,us.objects.nyc).features)
-    // .enter().append("path")
-    // // .attr("class", function(d){return quantize(rateById.get(d.id))})
-    // // .attr("class", function(d){return 'Z'+d.id;})
-    // .attr("d", path)
-    // .classed("zippy",true)
-    // .on('click',function(d)
-    // {
-    //   var rateclick = rateById.get(d.id);
-    //   var paths = d3.select('path')
-    //   var pathclick = d3.selectAll('path');
-    //   // pathclick.attr("class",function(d){ if (rateById.get(d.id) >= rateclick){ return quantize(rateById.get(d.id))}})
-    // });
-
-
-
-
 
   };
   </script>
