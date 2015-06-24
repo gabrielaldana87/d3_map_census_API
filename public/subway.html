@@ -8,15 +8,19 @@
 <style>
 
 path{
-  /*stroke-width:.5;*/
-  stroke-linejoin:round;
-  stroke:red;
+  /*stroke-linejoin:round;
+  stroke:red;*/
   fill: rgba(255,255,255,0);
 }
 path:hover{
   stroke:red;
   stroke-width:1;
 }
+
+.borough_map{
+  fill:rgba(165,165,165,.3);
+}
+
 
 .line1  {stroke: #EE352E;}
 .line2  {stroke: #EE352E;}
@@ -40,6 +44,8 @@ path:hover{
 .lineR  {stroke: #FCCC0A;}
 .lineS  {stroke: #808183;}
 .line7  {stroke: purple;}
+.lineAir { stroke: steelblue;}
+.lineSI {stroke: grey;}
 
 svg{
   background-color:white;
@@ -171,6 +177,8 @@ text{
 
   var featureGroup = svg.append('g').attr('class','feature-group');
 
+  var g = svg.append('g').attr("class","borough_overlay");
+
   var keys = d3.select('#leftdiv').append('div').attr('class','keys');
 
   var tooltip = d3.select('body').append('div')
@@ -193,6 +201,13 @@ text{
               .call(zoom.event);
 
   function ready(error, us, routes) {
+    console.log(topojson.feature(routes,routes.objects.subway).features[0].geometry.coordinates[0][0]);
+    g.selectAll("path.borough_overlay")
+      .data(topojson.feature(us,us.objects.nyc).features)
+      .enter()
+      .append("path")
+      .attr('d',path)
+      .attr('class',"borough_map");
 
       var lines = topojson.feature(routes,routes.objects.subway).features;
 
@@ -228,7 +243,8 @@ text{
       //               .y(function (d) { return d[1]; })
       //               .interpolate("basis");
 
-
+console.log(topojson.feature(routes,routes.objects.subway).features);
+      var routePath =
       featureGroup.selectAll('.route')
             .data(topojson.feature(routes,routes.objects.subway).features)
             .enter()
@@ -241,7 +257,7 @@ text{
 
                 if(d.geometry.type==="LineString")
                 {
-                    array.push(d.geometry.coordinates);
+                    // array.push(d.geometry.coordinates);
                 }
                 if(d.geometry.type==="MultiLineString")
                 {
@@ -250,26 +266,72 @@ text{
                   array.push(each);
                   });
                 };
-
                 return path(
                 {
                     type: "MultiLineString",
                     coordinates: array
                 });
 
-
             })
-            // .attr("transform", function(d){ return "translate(" + projection(d.geometry.coordinates) + ")"})
-            // .attr("x", function(d){ return d.geometry.coordinates[0] > -1? 6: -6;})
-          // .attr("d",path(
-          //     {
-          //       type: "MultiLineString",
-          //       coordinates: object.arrayset
-          //     })
-          // )
-          //  .style('stroke', 'red')
-           .style('stroke-opacity', .3)
-           .style('stroke-width', 5);
+           .style('stroke-opacity', 1)
+           .style('stroke-width', 5)
+           .on("mouseover",function(d,i)
+           {
+
+           });
+
+          //  console.log(topojson.feature(routes,routes.objects.subway).features[1].geometry.coordinates)
+
+var circle = svg.selectAll(".point")
+           .data([1])
+           .enter().append("circle")
+           .attr("r",5)
+           .attr("cx",616.9774511869764)
+           .attr("cy",852.8658360008121)
+          //  .attr("transform", function(d,i) {return "translate(" + projection(d[i]) +")"})
+           .style("fill","crimson")
+           .style("opacity",.5);
+
+
+transition();
+
+
+    function transition()
+      {
+        circle
+        .transition()
+        .duration(10000)
+        .attrTween("transform", translateAlong(routePath.node()))
+        .each("end",transition);
+      }
+
+      function translateAlong(routePath) {
+  var l = routePath.getTotalLength();
+
+  return function(d, i, a) {
+    // console.log(i)
+    return function(t) {
+      var p = routePath.getPointAtLength(t * l);
+      var addy = (p.y)-852.8658360008121;
+      var addx = (p.x)-616.9774511869764
+
+
+      return "translate(" + addx + "," + addy + ")";
+    };
+  };
+}
+
+
+
+
+
+            //  .attr("transform", function(d,i) {
+            //   //  console.log(projection(d[i]))
+            //    return "translate(" +projection(d) +")"
+            //    })
+            //  .each("end", transition)
+
+
 
     // .append("g")
     // .attr("class", "zips")
