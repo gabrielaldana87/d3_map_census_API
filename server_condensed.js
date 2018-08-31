@@ -49,9 +49,10 @@ app.get('/choropleths/zip', function(req,res) {
 });
 
 app.get('/subway', function(req, res){
+  //
   res.sendFile(__dirname + 'public/subway.html');
 });
-  
+
 app.get('/choropleths/CREATE/:indicator',function(req, res)
   {
   if(req.params.indicator!=='favicon.ico')
