@@ -6,7 +6,7 @@ var sqlite3 = require("sqlite3").verbose();
 var cors = require('cors');
 
 var db = new sqlite3.Database("mapping.db");
-var db2 = new sqlite3.Database("stop_frisk.db")
+var db2 = new sqlite3.Database("stop_frisk.db");
 
 var app = express();
 app.use(cors());
@@ -16,27 +16,23 @@ var array2 = [];
 
 app.use(express.static(__dirname + '/public'));
 
-fs.readFile("./key.txt",function(e,data)
-{
+fs.readFile("./key.txt",function(e,data) {
+  console.log('here')
   var key = data.toString();
 
-app.get('/visualizations',function(req,res)
-{
+app.get('/visualizations',function(req,res) {
   res.sendFile(__dirname + '/public/bivar_splash.html');
 });
 
-app.get('/about_me', function(req,res)
-{
+app.get('/about_me', function(req,res) {
   res.sendFile(__dirname + '/public/about_me.html');
 });
 
-app.get('/choropleths',function(req,res)
-{
+app.get('/choropleths',function(req,res) {
   res.sendFile(__dirname + '/public/us_map_indicators.html');
 });
 
-app.get('/choropleths/variables', function(req,res)
-{
+app.get('/choropleths/variables', function(req,res) {
 db.all("SELECT * FROM variables", function(err, rows)
   {
   if(err) {throw err;}
@@ -49,12 +45,10 @@ app.get('/choropleths/zip', function(req,res) {
 });
 
 app.get('/subway', function(req, res){
-  //
   res.sendFile(__dirname + 'public/subway.html');
 });
 
-app.get('/choropleths/CREATE/:indicator',function(req, res)
-  {
+app.get('/choropleths/CREATE/:indicator',function(req, res) {
   if(req.params.indicator!=='favicon.ico')
     {
     var url  = "http://api.census.gov/data/2012/acs5/profile?get="+req.params.indicator+"&for=county:*"+key;
@@ -160,9 +154,7 @@ for(i=0;i<read.length;i++){
     };
 });
 
-
-app.get('/choropleths/:indicator',function(req, res)
-  {
+app.get('/choropleths/:indicator',function(req, res) {
   if(req.params.indicator!=='favicon.ico')
     {
           db.all("SELECT county_c_id, county_min, county_max  FROM county_min_max WHERE county_c_id=(?)",
@@ -258,8 +250,7 @@ app.get('/bivariate/:indicator1/:indicator2',function(req,res)
     };
 });
 
-app.get('/bivariate/zips/:indicator1/:indicator2',function(req,res)
-{
+app.get('/bivariate/zips/:indicator1/:indicator2',function(req,res) {
   if(req.params.indicator!=='favicon.ico')
     {
       console.log(req.params.indicator1);
@@ -268,8 +259,7 @@ app.get('/bivariate/zips/:indicator1/:indicator2',function(req,res)
       db.all("SELECT A.ZCTA5, SUM(A.ZPOPPCT) AS SUM_ZPOPPCT, SUM(A.POPPT) AS SUM_POPPCT, B.RATE as inc_rate, C.RATE as edu_rate, COUNT(*) AS ZIP_SHAPES FROM zcta_cnty_rel AS A left JOIN DP03_0062E AS B ON A.ZCTA5=B.id LEFT JOIN DP02_0067PE AS C ON A.ZCTA5=C.ID WHERE A.STATE=(?)  AND A.COUNTY=(?) AND A.POPPT >0 GROUP BY A.ZCTA5,inc_rate, edu_rate ORDER BY SUM_POPPCT DESC",
       parseInt(req.params.indicator1),
       parseInt(req.params.indicator2),
-      function(err, row)
-        {
+      function(err, row) {
         if(err) {throw err;}
         res.json(row);
         });
